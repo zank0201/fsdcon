@@ -14,6 +14,9 @@ migrate = Migrate(app, db)
 ma = Marshmallow(app)
 import models
 
+weights_schema = models.getweightsSchema()
+results_schema = models.ResultSchema()
+
 
 ####Models####
 @app.route('/')
@@ -37,6 +40,7 @@ def betas_table(rdate, mktIndexCode):
                                           total_risk=new_data[i]['Total Risk'])
             db.session.add(my_new_result)
             db.session.commit()
+
         return f'<h1>{rdate}</h1>'
 
 @app.route("/getweights", methods=['GET', "POST"])

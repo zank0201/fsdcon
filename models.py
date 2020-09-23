@@ -1,5 +1,4 @@
-
-from app import db
+from app import db, ma
 
 
 ####Models####
@@ -16,6 +15,11 @@ class getweights(db.Model):
 
     def __repr__(self):
         return 'alpha: {}'.format(self.alpha), 'weights: {}'.format(self.weights)
+
+
+class getweightsSchema(ma.ModelSchema):
+    class Meta:
+        model = getweights
 
 
 class Result(db.Model):
@@ -41,3 +45,7 @@ class Result(db.Model):
         return 'instrument: {}'.format(self.instrument), 'beta: {}'.format(self.beta), \
                'unique risk:{}'.format(self.unique_risk), 'total risk: {}'.format(self.total_risk)
 
+
+class ResultSchema(ma.ModelSchema):
+    class Meta:
+        model = Result
