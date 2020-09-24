@@ -1,5 +1,5 @@
 from app import db, ma
-
+from marshmallow_sqlalchemy import ModelSchema
 
 ####Models####
 class getweights(db.Model):
@@ -12,14 +12,6 @@ class getweights(db.Model):
     def __init__(self, alpha: object, weights: object) -> object:
         self.alpha = alpha
         self.weights = weights
-
-    def __repr__(self):
-        return 'alpha: {}'.format(self.alpha), 'weights: {}'.format(self.weights)
-
-
-class getweightsSchema(ma.ModelSchema):
-    class Meta:
-        model = getweights
 
 
 class Result(db.Model):
@@ -37,15 +29,22 @@ class Result(db.Model):
         self.unique_risk = unique_risk
         self.total_risk = total_risk
 
-    # def json(self):
-    #     return {'instrument': self.instrument, 'beta': self.beta, 'unique risk': self.unique_risk,
-    #             'total risk': self.total_risk}
 
-    def __repr__(self):
-        return 'instrument: {}'.format(self.instrument), 'beta: {}'.format(self.beta), \
-               'unique risk:{}'.format(self.unique_risk), 'total risk: {}'.format(self.total_risk)
+class getweightsSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = getweights
+        sqla_session = db.session
 
 
-class ResultSchema(ma.ModelSchema):
+
+
+class ResultSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Result
+        sqla_session = db.session
+
+
+weight_schema = getweightsSchema(many=True)
+
+result_schema = ResultSchema(many=True)
+
