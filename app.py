@@ -58,7 +58,9 @@ def betas_table(rdate, mktIndexCode):
 
 @app.route("/getweights", methods=['GET', "POST"])
 def weights_table():
-
+    db.session.query(models.Result).delete()
+    db.session.query(models.getweights).delete()
+    db.session.commit()
     if request.method == 'POST':
         #take inputs from front end form
         rdate = request.form['rdate']
