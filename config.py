@@ -8,5 +8,5 @@ class BaseConfig(object):
     TESTING = False
     CSRF_ENABLED = True
     SECRET_KEY = 'this-really-needs-to-be-changed'
-    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:postgres@localhost/fsdcon"
+    SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://postgres:postgres@localhost/fsdcon"
 

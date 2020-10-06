@@ -18,7 +18,14 @@ def GetICsAndWeight(rDate, indexCode):
     # Convert Rdate to datetime for comparison
     # Create dataframe which contains dates being looked for
     datetbl = (tbl_Index_Constituents[tbl_Index_Constituents["Date"] == rDate])
-    newdata = datetbl[datetbl[indexCode + " New"] == indexCode]
+    ics = ["LRGC", "MIDC", "SMLC"]
+    if indexCode == "FLED":
+        newindex = 'ALSI'
+    elif indexCode in ics:
+        newindex = 'Index'
+    else:
+        newindex = indexCode
+    newdata = datetbl[datetbl[newindex + " New"] == newindex]
 
     # Select column with Index Code
     total = newdata["Gross Market Capitalisation"].sum(axis=0)

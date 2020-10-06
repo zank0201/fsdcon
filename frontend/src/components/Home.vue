@@ -14,6 +14,15 @@
         <option value="ALSI">ALSI</option>
         <option value="FLED">FLED</option>
         <option value="TOPI">TOPI</option>
+        <option value="LRGC">LRGC</option>
+        <option value="MIDC">MIDC</option>
+        <option value="SMLC">SMLC</option>
+        <option value="RESI">RESI</option>
+        <option value="FINI">FINI</option>
+        <option value="INDI">INDI</option>
+        <option value="PCAP">PCAP</option>
+        <option value="SAPY">SAPY</option>
+        <option value="ALTI">ALTI</option>
       </select>
 
     </div>
@@ -25,11 +34,13 @@
         <option value="J200">J200</option>
         <option value="J203">J203</option>
         <option value="J250">J250</option>
+        <option value="J257">J257</option>
+        <option value="J258">J258</option>
       </select>
     </div>
 
     <div>
-      <button>Save Data</button>
+      <button>Submit</button>
      </div>
   </form>
     {{ allweights }}</div>
