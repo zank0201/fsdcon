@@ -3,13 +3,17 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from marshmallow_sqlalchemy import ModelSchema
-from config import Config
+from config import BaseConfig
 from database import GetICsAndWeight, GetBetasMktAndSpecVols
 import json
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
-app.config.from_object(Config)
+app.config.from_object('config.BaseConfig')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+cors = CORS(app, resources={r'/getweights/*': {"origins": "*"}})
+app.config['CORS_HEADERS'] = 'Content-Type'
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 ma = Marshmallow(app)
@@ -24,7 +28,8 @@ def home():
     return "home page"
 
 
-@app.route("/getdata/<rdate>/<mktIndexCode>")
+@app.route("/getweights/<rdate>/<mktIndexCode>")
+@cross_origin()
 def betas_table(rdate, mktIndexCode):
     #Get alpha column from database
     IC_data = db.session.query(models.getweights.alpha).all()
@@ -57,32 +62,31 @@ def betas_table(rdate, mktIndexCode):
 
 
 @app.route("/getweights", methods=['GET', "POST"])
+@cross_origin() # allow all origins all methods.
 def weights_table():
     db.session.query(models.Result).delete()
     db.session.query(models.getweights).delete()
     db.session.commit()
-    if request.method == 'POST':
+
         #take inputs from front end form
-        rdate = request.form['rdate']
-        indexCode = request.form['indexcode']
-        mktIndexCode = request.form['mktIndexCode']
-        #add as parameters to getICS
-        portframe = GetICsAndWeight(rDate=rdate, indexCode=indexCode)
-        #convert dataframe to dictonary
-        new_frame = portframe.to_dict('records')
-        #loop through index and add to data frame
-        for i in range(len(new_frame)):
-            new_weights = models.getweights(alpha=new_frame[i]["Alpha"], weights=new_frame[i]['weights'])
-            db.session.add(new_weights)
-            db.session.commit()
-        #Once post is completed, redirect to betas output
-        return redirect(url_for('betas_table', rdate=rdate, mktIndexCode=mktIndexCode))
-    else:
-
-        return render_template('index.html')
+    data = request.get_json()
+    rdate = data['rdate']
+    indexCode = data['indexCode']
+    mktIndexCode = data['mktIndex']
+    #add as parameters to getICS
+    portframe = GetICsAndWeight(rDate=rdate, indexCode=indexCode)
+    #convert dataframe to dictonary
+    new_frame = portframe.to_dict('records')
+    #loop through index and add to data frame
+    for i in range(len(new_frame)):
+        new_weights = models.getweights(alpha=new_frame[i]["Alpha"], weights=new_frame[i]['weights'])
+        db.session.add(new_weights)
+        db.session.commit()
+    #Once post is completed, redirect to betas output
+    return redirect(url_for('betas_table', rdate=rdate, mktIndexCode=mktIndexCode))
 
 
-# api.add_resource(PuppyResource, '/puppy/<string:name>')
-# api.add_resource(AllPuppies, '/puppies')
+
+
 if __name__ == '__main__':
     app.run(debug=True)

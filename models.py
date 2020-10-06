@@ -1,5 +1,5 @@
 from app import db, ma
-from marshmallow_sqlalchemy import ModelSchema
+
 
 ####Models####
 class getweights(db.Model):
