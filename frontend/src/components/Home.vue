@@ -43,6 +43,7 @@
       <button>Submit</button>
      </div>
   </form>
+<!--    Graphs of function 3 and 2-->
     <div>
       <zing-grid
     ref="myGrid"
@@ -87,6 +88,7 @@
     </div>
   </div>
 
+<!--    Graphs-->
     <div class="row">
         <div class="col-md-4">
           <chart :options="ChartOptionsBar"></chart>
@@ -118,6 +120,7 @@ export default {
       statsvals: [],
       allweights: [],
       allalphas: [],
+      alphaweights: [],
       ChartOptionsBar: {},
       ChartOptionsLine: {},
       ChartOptionsPie: {}
@@ -140,6 +143,13 @@ export default {
       axios.get('http://localhost:5000/getweights/alpha')
         .then((response) => {
           this.allalphas = response.data
+          this.getpie()
+        })
+    },
+    getpie () {
+      axios.get('http://localhost:5000/getweights/piechart')
+        .then((response) => {
+          this.alphaweights = response.data
           this.plotWeights()
         })
     },
@@ -165,6 +175,7 @@ export default {
         // eslint-disable-next-line no-unused-vars
         .then(response => {
           this.allbetas = response.data
+          console.log(this.allbetas.beta)
           this.getstats()
           this.getweights()
           console.log(response)

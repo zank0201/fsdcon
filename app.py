@@ -10,6 +10,9 @@ from flask_cors import CORS, cross_origin
 import pandas as pd
 import numpy as np
 
+from sqlalchemy.orm import load_only
+
+
 app = Flask(__name__)
 app.config.from_object('config.BaseConfig')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
@@ -28,14 +31,17 @@ def home():
     return "home page"
 
 
-@app.route("/getweights", methods=["POST"])
+@app.route("/getweights", methods=["POST", "GET"])
 @cross_origin()  # allow all origins all methods.
 def weights_table():
+
+
     # delete tables as something is posted
     db.session.query(models.Result).delete()
     db.session.query(models.getweights).delete()
     db.session.query(models.marketvol).delete()
     db.session.commit()
+
 
     # take inputs from front end form
     data = request.get_json()
@@ -130,7 +136,7 @@ def calcstats():
     return jsonify([{'pfBetas': round(pfBetas, 4), 'pfSysVol': round(pfSysVol, 4), 'pfSpecVol': round(pfSpecVol, 4),
                      'pfVol': round(pfVol, 4)}])
 
-
+# Get weights
 @app.route('/getweights/weights', methods=["GET"])
 @cross_origin()
 def weights():
@@ -151,8 +157,35 @@ def alpha():
     alpha = []
     for i in alpha_data:
         alpha.append(i[0])
-
     return jsonify(alpha)
+
+
+@app.route("/getweights/piechart", methods=["GET"])
+@cross_origin()
+def piechart():
+    alpha_data = db.session.query(models.getweights.alpha)
+
+    alpha = []
+
+    weights_data = db.session.query(models.getweights.weights)
+    # create empty list for variables
+    weights = []
+
+    for i in weights_data:
+        weights.append(i[0])
+    for i in alpha_data:
+        alpha.append(i[0])
+
+    dict_list = {'name': alpha, 'value': weights}
+
+    newdate = pd.DataFrame(dict_list)
+
+    result = newdate.to_json(orient='records')
+    parsedresult = json.loads(result)
+    output = json.dumps(parsedresult, indent=4)
+
+    return output
+
 
 
 
