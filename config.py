@@ -10,3 +10,19 @@ class BaseConfig(object):
     SECRET_KEY = 'this-really-needs-to-be-changed'
     SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://postgres:postgres@localhost/fsdcon"
 
+class ProductionConfig(BaseConfig):
+    DEBUG = False
+
+
+class StagingConfig(BaseConfig):
+    DEVELOPMENT = True
+    DEBUG = True
+
+
+class DevelopmentConfig(BaseConfig):
+    DEVELOPMENT = True
+    DEBUG = True
+
+
+class TestingConfig(BaseConfig):
+    TESTING = True

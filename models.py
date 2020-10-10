@@ -22,12 +22,23 @@ class Result(db.Model):
     beta = db.Column(db.Float())
     unique_risk = db.Column(db.Float())
     total_risk = db.Column(db.Float())
+    mkt_vol = db.Column(db.Float())
 
     def __init__(self, instrument: object, beta: object, unique_risk: object, total_risk: object) -> object:
         self.instrument = instrument
         self.beta = beta
         self.unique_risk = unique_risk
         self.total_risk = total_risk
+
+class marketvol(db.Model):
+    __tablename__ = 'market'
+
+    id = db.Column(db.Integer, primary_key=True)
+    mktvol = db.Column(db.Float())
+
+    def __init__(self, mktvol) -> object:
+        self.mktvol = mktvol
+
 
 
 class getweightsSchema(ma.SQLAlchemyAutoSchema):
@@ -43,8 +54,14 @@ class ResultSchema(ma.SQLAlchemyAutoSchema):
         model = Result
         sqla_session = db.session
 
+class marketvolSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = marketvol
+        sqla_session = db.session
 
 weight_schema = getweightsSchema(many=True)
 
 result_schema = ResultSchema(many=True)
+
+mkt_schema = marketvolSchema(many=True)
 

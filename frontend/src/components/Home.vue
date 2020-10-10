@@ -43,28 +43,81 @@
       <button>Submit</button>
      </div>
   </form>
-    {{ allweights }}</div>
+    <div>
+      <zing-grid
+    ref="myGrid"
+    caption="Portfolio Summary"
+    layout="row"
+    viewport-stop
+    :data.prop="allweights"
+    filter sort pager
+  >
+    <zg-colgroup>
+      <zg-column index="instrument" header="Share"></zg-column>
+      <zg-column index="beta" header="Beta"></zg-column>
+      <zg-column index="unique_risk" header="Unique Risk"></zg-column>
+      <zg-column index = 'total_risk' header="Total Risk"></zg-column>
+
+    </zg-colgroup>
+  </zing-grid>
+    </div>
+    <div>
+
+    </div>
+  <div>
+
+<!--      function 3-->
+    <div>
+
+    <zing-grid
+    ref="newGrid"
+    caption="Portfolio stats"
+    layout="row"
+    viewport-stop
+    :data.prop="statsvals"
+    filter sort pager
+      >
+<!--        table starts-->
+
+        <zg-column index='pfBetas' header="Portfolio betas"></zg-column>
+        <zg-column index='pfSysVol' header="Portfolio Systematic Variance"></zg-column>
+        <zg-column index="pfSpecVol" header="Portfolio Specific Variance"></zg-column>
+        <zg-column index="pfVol" header="Portfolio Variance"></zg-column>
+    </zing-grid>
+    </div>
+  </div>
+
+  </div>
 </template>
 
 <script>
+// eslint-disable-next-line no-unused-vars
+import Zingrid from 'zinggrid'
 import axios from 'axios'
 
 export default {
+
   data () {
     return {
       rdate: '',
       indexCode: 'ALSI',
       mktIndex: 'J200',
-      allweights: []
+      allweights: [],
+      statsvals: []
 
     }
   },
+  mounted () {
+    // this.$refs.myGrid.setData(this.allweights)
+    // this.$refs.newGrids.setData(this.statsvals)
+  },
   methods: {
-    getBetas () {
-      axios.get(`http://localhost:5000/getweights/${this.rdate}/${this.mktIndex}`)
+    getstats () {
+      axios.get('http://localhost:5000/getweights/stats')
         .then((response) => {
-          console.log(response.data)
-          this.allweights = response.data
+          console.log(response)
+          this.statsvals = response.data
+          return this.statsvals
         })
     },
 
@@ -80,7 +133,9 @@ export default {
         // eslint-disable-next-line no-unused-vars
         .then(response => {
           this.allweights = response.data
+          this.getstats()
           console.log(response)
+          // return this.allweights
         })
         .catch(error => console.log(error))
     }
@@ -140,4 +195,5 @@ button:active {
   border-color: #002350;
   background-color: #002350;
 }
+
 </style>
