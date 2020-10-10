@@ -86,7 +86,8 @@
     </zing-grid>
     </div>
   </div>
-
+    <button @click="getweights">Submit</button>
+    {{alphas}}
   </div>
 </template>
 
@@ -103,7 +104,8 @@ export default {
       indexCode: 'ALSI',
       mktIndex: 'J200',
       allweights: [],
-      statsvals: []
+      statsvals: [],
+      alphas: []
 
     }
   },
@@ -112,6 +114,12 @@ export default {
     // this.$refs.newGrids.setData(this.statsvals)
   },
   methods: {
+    getweights () {
+      axios.get('http://localhost:5000/getweights/weights')
+        .then((response) => {
+          this.alphas = response.data
+        })
+    },
     getstats () {
       axios.get('http://localhost:5000/getweights/stats')
         .then((response) => {

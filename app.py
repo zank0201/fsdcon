@@ -127,7 +127,35 @@ def calcstats():
                                                                                       specVols=specvol,
                                                                                       totalRisk=totalrisk)
 
-    return jsonify([{'pfBetas': round(pfBetas, 4), 'pfSysVol': round(pfSysVol,4), 'pfSpecVol': round(pfSpecVol,4), 'pfVol': round(pfVol,4)}])
+    return jsonify([{'pfBetas': round(pfBetas, 4), 'pfSysVol': round(pfSysVol, 4), 'pfSpecVol': round(pfSpecVol, 4),
+                     'pfVol': round(pfVol, 4)}])
+
+
+@app.route('/getweights/weights', methods=["GET"])
+@cross_origin()
+def weights():
+    weights_data = db.session.query(models.getweights.weights)
+    # create empty list for variables
+    weights = []
+
+    for i in weights_data:
+        weights.append(i[0])
+
+    return jsonify(weights)
+
+@app.route('/getweights/alpha', methods=["GET"])
+@cross_origin()
+def alpha():
+    alpha_data = db.session.query(models.getweights.alpha)
+
+    alpha = []
+    for i in alpha_data:
+        alpha.append(i[0])
+
+    return jsonify(alpha)
+
+
+
 
 
 if __name__ == '__main__':
