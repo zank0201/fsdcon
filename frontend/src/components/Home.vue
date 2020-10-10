@@ -49,7 +49,7 @@
     caption="Portfolio Summary"
     layout="row"
     viewport-stop
-    :data.prop="allweights"
+    :data.prop="allbetas"
     filter sort pager
   >
     <zg-colgroup>
@@ -86,8 +86,19 @@
     </zing-grid>
     </div>
   </div>
-    <button @click="getweights">Submit</button>
-    {{alphas}}
+
+    <div class="row">
+        <div class="col-md-4">
+          <chart :options="ChartOptionsBar"></chart>
+        </div>
+        <div class="col-md-4">
+          <chart :options="ChartOptionsLine"></chart>
+        </div>
+        <div class="col-md-4">
+            <chart :options="ChartOptionsPie"></chart>
+        </div>
+    </div>
+
   </div>
 </template>
 
@@ -103,9 +114,13 @@ export default {
       rdate: '',
       indexCode: 'ALSI',
       mktIndex: 'J200',
-      allweights: [],
+      allbetas: [],
       statsvals: [],
-      alphas: []
+      allweights: [],
+      allalphas: [],
+      ChartOptionsBar: {},
+      ChartOptionsLine: {},
+      ChartOptionsPie: {}
 
     }
   },
@@ -117,9 +132,18 @@ export default {
     getweights () {
       axios.get('http://localhost:5000/getweights/weights')
         .then((response) => {
-          this.alphas = response.data
+          this.allweights = response.data
+          this.getalphas()
         })
     },
+    getalphas () {
+      axios.get('http://localhost:5000/getweights/alpha')
+        .then((response) => {
+          this.allalphas = response.data
+          this.plotWeights()
+        })
+    },
+
     getstats () {
       axios.get('http://localhost:5000/getweights/stats')
         .then((response) => {
@@ -140,12 +164,121 @@ export default {
       axios.post('http://localhost:5000/getweights', formdata, {crossdomain: true})
         // eslint-disable-next-line no-unused-vars
         .then(response => {
-          this.allweights = response.data
+          this.allbetas = response.data
           this.getstats()
+          this.getweights()
           console.log(response)
           // return this.allweights
         })
         .catch(error => console.log(error))
+    },
+
+    plotWeights () {
+      this.ChartOptionsBar = {
+        xAxis: {
+          // eslint-disable-next-line
+          data: this.allalphas,
+          type: 'category',
+          axisLabel: {
+            show: true,
+            textStyle: {
+              color: 'red'
+            },
+            interval: 0,
+            rotate: 90
+          }
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [{
+          data: this.allweights,
+          type: 'bar',
+          showBackground: true,
+          backgroundStyle: {
+            color: 'rgba(220, 220, 220, 0.8)'
+          }
+        }],
+        title: {
+          text: 'Alpha Weights',
+          x: 'center',
+          textStyle: {
+            fontSize: 24
+          }
+        }
+      }
+      this.ChartOptionsLine = {
+        xAxis: {
+          type: 'category',
+          data: this.allalphas,
+          axisLabel: {
+            interval: 0,
+            rotate: 90
+          }
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [{
+          data: this.allweights,
+          type: 'line'
+        }]
+      }
+      this.ChartOptionsPie = {
+        title: {
+          text: 'Weights',
+          left: 'center'
+        },
+        // tooltip: {
+        //   trigger: 'item',
+        //   formatter: this.allalphas,
+        // },
+        legend: {
+          // type: 'scroll',
+          orient: 'vertical',
+          left: 10,
+          // top: 20,
+          // bottom: 20,
+          data: this.allalphas
+          // selected: this.allalphas.selected,
+        },
+        series: [
+          {
+            name: 'Weights',
+            type: 'pie',
+            radius: '80%',
+            // radius: ['55%', '70%'],
+            avoidoverlap: false,
+            // center: ['40%', '50%'],
+            data: this.alphaweights,
+            animation: false,
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+              },
+              label: {
+                show: true,
+                fontSize: '30',
+                fontWeight: 'bold'
+              }
+            },
+            labelLine: {
+              show: false
+            },
+            // label: {
+            //   position: 'outer',
+            //   alignTo: 'none',
+            //   bleedMargin: 0,
+            // },
+            left: '33.3333%',
+            right: '33.3333%',
+            top: 10,
+            bottom: 0
+          }
+        ]
+      }
     }
   }
 

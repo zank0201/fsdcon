@@ -8,6 +8,7 @@ import './../node_modules/bulma/css/bulma.css'
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
 
+import '@/plugins/echarts'
 // eslint-disable-next-line no-unused-vars
 import ZingGrid from 'zinggrid'
 Vue.component('zinggrid')
