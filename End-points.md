@@ -3,16 +3,12 @@
 #### [Form input](#form-endpoints)
 * [Add data to database](#add-data)
 
-#### [Wallet endpoints](#wallet-endpoints)
-* [Create wallet](#create-wallet)
+#### [Portfolio stats](#portfolio-stats)
+* [Get Stats](#get-stats)
 
-### [OTP endpoints](#otp-endpoints)
-* [Confirm OTP](#confirm-otp)
-* [Resend OTP](#resend-otp)
-
-### [Add Test Results Endpoints](#add-test-results-endpoints)
-* [Add test result](#add-test-result)
-* [Get Wallet Status](#get-wallet-status)
+#### [Graph outputs](#graphs)
+* [Create bar-graph](#create-bar-graph)
+* [Create pie-graph](#create-pie-graph)
 
 [> Back to `README.md`](https://github.com/zank0201/fsdcon/new/master/README.md)
 
@@ -21,7 +17,7 @@
 
 ## Add data to database
 **GET** [http://localhost:5000/getweights/2017-09/J200/TOPI](http://localhost:5000/getweights/2017-09/J200/TOPI)
-
+### Response
 ```
 [
   {
@@ -627,6 +623,142 @@
 ]
 
 ```
+# Portfolio stats
+Note, before these functions can be run, the post request above needs to be run.
+
+## Get Stats
+**GET** [http://localhost:5000/getweights/stats](http://localhost:5000/getweights/stats)
+
+### Response:
+```
+[
+  {
+    "pfBetas": 0.9129, 
+    "pfSpecVol": 0.0029, 
+    "pfSysVol": 0.2017, 
+    "pfVol": 0.0151
+  }
+]
+```
+# Graph outputs
+
+## Create bar-graph
+Note, before these functions can be run, the post request above needs to be run.
+
+**GET** [http://localhost:5000/getweights/weights](http://localhost:5000/getweights/weights)
+### Response:
+```
+[
+  0.036577810063437216, 
+  0.014793519059101114, 
+  0.01222506817634425, 
+  0.19430098772323076, 
+  0.06972380653085901, 
+  0.010946324503974184, 
+  0.0049246119519301855, 
+  0.005663081986525002, 
+  0.00352122482785417, 
+  0.006734937113200328, 
+  0.010643954922016603, 
+  0.01536069895606212, 
+  0.027873092238387985, 
+  0.15034391505893535, 
+  0.004300030218193454, 
+  0.007016399193233402, 
+  0.013715447062230594, 
+  0.005661631266079534, 
+  0.014272339537224227, 
+  0.032796940531848486, 
+  0.00903636949754823, 
+  0.008053781782019957, 
+  0.0063500820469363055, 
+  0.015017339386491264, 
+  0.057851774811185926, 
+  0.006832542973623049, 
+  0.011846328876660197, 
+  0.0023900610153996813, 
+  0.036875621425599726, 
+  0.008528435258925158, 
+  0.007682882487842475, 
+  0.004305655742329532, 
+  0.0049516550047739635, 
+  0.005381251221782871, 
+  0.013193820032233185, 
+  0.011894946184264336, 
+  0.02015662241160608, 
+  0.006434591821501664, 
+  0.011051095050967234, 
+  0.030950264308969074, 
+  0.017738971390597, 
+  0.030279193587032613, 
+  0.03180089276104251
+]
+```
+
+**GET** [http://localhost:5000/getweights/alpha](http://localhost:5000/getweights/alpha)
+### Response:
+```
+[
+  "AGL", 
+  "APN", 
+  "BID", 
+  "BTI", 
+  "CFR", 
+  "DSY", 
+  "FFB", 
+  "GFI", 
+  "INL", 
+  "ITU", 
+  "MEI", 
+  "MNP", 
+  "MTN", 
+  "NPN", 
+  "NTC", 
+  "RDF", 
+  "REM", 
+  "SAP", 
+  "SHP", 
+  "SNH", 
+  "TBS", 
+  "WHL", 
+  "ANG", 
+  "BGA", 
+  "BIL", 
+  "BVT", 
+  "CPI", 
+  "FFA", 
+  "FSR", 
+  "GRT", 
+  "INP", 
+  "LHC", 
+  "MND", 
+  "MRP", 
+  "NED", 
+  "NRP", 
+  "OML", 
+  "REI", 
+  "RMH", 
+  "SBK", 
+  "SLM", 
+  "SOL", 
+  "VOD"
+]
+```
+
+## Create pie-graph
+
+**GET** [http://localhost:5000/getweights/piechart](http://localhost:5000/getweights/piechart)
+
+### Response:
+```
+[ { "name": "AGL", "value": 0.0365778101 }, { "name": "APN", "value": 0.0147935191 }, { "name": "BID", "value": 0.0122250682 }, { "name": "BTI", "value": 0.1943009877 }, { "name": "CFR", "value": 0.0697238065 }, { "name": "DSY", "value": 0.0109463245 }, { "name": "FFB", "value": 0.004924612 }, { "name": "GFI", "value": 0.005663082 }, { "name": "INL", "value": 0.0035212248 }, { "name": "ITU", "value": 0.0067349371 }, { "name": "MEI", "value": 0.0106439549 }, { "name": "MNP", "value": 0.015360699 }, { "name": "MTN", "value": 0.0278730922 }, { "name": "NPN", "value": 0.1503439151 }, { "name": "NTC", "value": 0.0043000302 }, { "name": "RDF", "value": 0.0070163992 }, { "name": "REM", "value": 0.0137154471 }, { "name": "SAP", "value": 0.0056616313 }, { "name": "SHP", "value": 0.0142723395 }, { "name": "SNH", "value": 0.0327969405 }, { "name": "TBS", "value": 0.0090363695 }, { "name": "WHL", "value": 0.0080537818 }, { "name": "ANG", "value": 0.006350082 }, { "name": "BGA", "value": 0.0150173394 }, { "name": "BIL", "value": 0.0578517748 }, { "name": "BVT", "value": 0.006832543 }, { "name": "CPI", "value": 0.0118463289 }, { "name": "FFA", "value": 0.002390061 }, { "name": "FSR", "value": 0.0368756214 }, { "name": "GRT", "value": 0.0085284353 }, { "name": "INP", "value": 0.0076828825 }, { "name": "LHC", "value": 0.0043056557 }, { "name": "MND", "value": 0.004951655 }, { "name": "MRP", "value": 0.0053812512 }, { "name": "NED", "value": 0.01319382 }, { "name": "NRP", "value": 0.0118949462 }, { "name": "OML", "value": 0.0201566224 }, { "name": "REI", "value": 0.0064345918 }, { "name": "RMH", "value": 0.0110510951 }, { "name": "SBK", "value": 0.0309502643 }, { "name": "SLM", "value": 0.0177389714 }, { "name": "SOL", "value": 0.0302791936 }, { "name": "VOD", "value": 0.0318008928 } ]
+```
+
+
+
+
+
+
 
 
 
