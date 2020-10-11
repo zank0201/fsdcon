@@ -5,7 +5,7 @@
 One Paragraph of project description goes here
 
 
-### Requirements
+## Requirements
 * Clone this repository: 
 ```
 https://github.com/zank0201/fsdcon.git
@@ -23,7 +23,7 @@ psql -U postgres
 CREATE DATABASE fsdcon
 ```
 
-### Installing
+## Installing
 ### API
 * Enter the root file and install the python dependencies from requirements.txt:
 ```
@@ -33,7 +33,7 @@ pip install -r requirement.txt
 ```
 python app.py
 ```
-
+### Frontend
 * Enter the frontend folder and install the dependencies:
 
 ```
