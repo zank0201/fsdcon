@@ -1,4 +1,4 @@
-# Flask Restful-API
+# RESTful-API using Flask
 
 #### [Form input](#form-endpoints)
 * [Add data to database](#add-data)
