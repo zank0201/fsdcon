@@ -43,6 +43,16 @@
       <button>Submit</button>
      </div>
   </form>
+
+<!--    Graphs-->
+    <div class="row">
+        <div class="col-md-6">
+          <chart :options="ChartOptionsBar"></chart>
+        </div>
+        <div class="col-md-6">
+            <chart :options="ChartOptionsPie"></chart>
+        </div>
+    </div>
 <!--    Graphs of function 3 and 2-->
     <div>
       <zing-grid
@@ -87,19 +97,6 @@
     </zing-grid>
     </div>
   </div>
-
-<!--    Graphs-->
-    <div class="row">
-        <div class="col-md-4">
-          <chart :options="ChartOptionsBar"></chart>
-        </div>
-        <div class="col-md-4">
-          <chart :options="ChartOptionsLine"></chart>
-        </div>
-        <div class="col-md-4">
-            <chart :options="ChartOptionsPie"></chart>
-        </div>
-    </div>
 
   </div>
 </template>
@@ -218,75 +215,64 @@ export default {
           }
         }
       }
-      this.ChartOptionsLine = {
-        xAxis: {
-          type: 'category',
-          data: this.allalphas,
-          axisLabel: {
-            interval: 0,
-            rotate: 90
-          }
-        },
-        yAxis: {
-          type: 'value'
-        },
-        series: [{
-          data: this.allweights,
-          type: 'line'
-        }]
-      }
+
       this.ChartOptionsPie = {
         title: {
           text: 'Weights',
           left: 'center'
         },
-        // tooltip: {
-        //   trigger: 'item',
-        //   formatter: this.allalphas,
-        // },
+        tooltip: {
+          trigger: 'item',
+          formatter: this.allalphas
+        },
         legend: {
-          // type: 'scroll',
+          type: 'scroll',
           orient: 'vertical',
-          left: 10,
-          // top: 20,
-          // bottom: 20,
-          data: this.allalphas
-          // selected: this.allalphas.selected,
+          show: true,
+          right: 'auto',
+          left: 'auto',
+          top: 'auto',
+          bottom: 'auto',
+          data: this.alphaweights,
+          selected: this.alphaweights.selected
         },
         series: [
           {
             name: 'Weights',
             type: 'pie',
-            radius: '80%',
+            radius: '40%',
             // radius: ['55%', '70%'],
-            avoidoverlap: false,
-            // center: ['40%', '50%'],
+            // avoidoverlap: false,
+            center: ['40%', '50%'],
             data: this.alphaweights,
-            animation: false,
+            // animation: true,
             emphasis: {
               itemStyle: {
-                shadowBlur: 10,
+                shadowBlur: 5,
                 shadowOffsetX: 0,
                 shadowColor: 'rgba(0, 0, 0, 0.5)'
-              },
-              label: {
-                show: true,
-                fontSize: '30',
-                fontWeight: 'bold'
               }
+              // label: {
+              //   show: true,
+              //   fontSize: '10'
+              //   // fontWeight: 'bold'
+              // }
             },
-            labelLine: {
-              show: false
-            },
+            // labelLine: {
+            //   show: false
+            // },
             // label: {
             //   position: 'outer',
             //   alignTo: 'none',
             //   bleedMargin: 0,
             // },
-            left: '33.3333%',
-            right: '33.3333%',
-            top: 10,
-            bottom: 0
+            left: '40%',
+            right: '40%',
+            align: 'auto',
+            top: 'auto',
+            bottom: 'auto',
+            height: 400,
+            width: 400
           }
         ]
       }
