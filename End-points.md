@@ -10,7 +10,7 @@
 * [Create bar-graph](#create-bar-graph)
 * [Create pie-graph](#create-pie-graph)
 
-[> Back to `README.md`](https://github.com/zank0201/fsdcon/new/master/README.md)
+[> Back to `README.md`](https://github.com/zank0201/fsdcon/blob/master/README.md)
 
 ---
 # Form input
