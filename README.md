@@ -24,6 +24,8 @@ CREATE DATABASE fsdcon
 
 ## Installing
 ### API
+
+[Find the End-Points documentation at `End-points.md`](https://github.com/zank0201/fsdcon/blob/master/End-points.md)
 * Enter the root file and install the python dependencies from requirements.txt:
 ```
 pip install -r requirement.txt
