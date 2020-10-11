@@ -8,7 +8,7 @@ One Paragraph of project description goes here
 ## Requirements
 * Clone this repository: 
 ```
-https://github.com/zank0201/fsdcon.git
+git clone https://github.com/zank0201/fsdcon.git
 ```
 * Install postgressql locally and access the server from the terminal:
 ```
