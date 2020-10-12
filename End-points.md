@@ -645,7 +645,7 @@ Note, before these functions can be run, the post request above needs to be run.
 ## Create bar-graph
 Note, before these functions can be run, the post request above needs to be run.
 
-**GET** [http://localhost:5000/getweights/weights](http://localhost:5000/getweights/weights)
+**GET** [http://localhost:5000/getweights/betas](http://localhost:5000/getweights/betas)
 ### Response:
 ```
 [
