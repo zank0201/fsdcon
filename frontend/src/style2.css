@@ -1,0 +1,372 @@
+
+
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+
+#jumbotron{
+  text-align: center;
+}
+
+/* Navigation Bar */
+#nav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.navbar-brand img {
+    height: 100px;
+    padding: 0px;
+}
+
+.navbar-nav li {
+    padding: 0 10px;
+}
+
+.navbar-nav li a {
+    float: none;
+    text-align: right;
+}
+
+#nav-bar ul li a:hover {
+    color: #007bff!important;
+}
+
+.navbar {
+    background: #fff;
+
+}
+
+.navbar-toggler {
+    border: none!important;
+}
+
+.nav-link{
+    color: #555!important;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+/* Landing Info*/
+
+#Intro {
+    background-image: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.6)),
+    url(/images/Cpt.jpeg);
+    height: 50vh;
+    background-size: cover;
+    background-position: center;
+    padding: 10px;
+}
+
+ #Intro h1 {
+     display: block;
+    color: white;
+    text-align: center;
+    font-weight: 350;
+    font-size: 30px;
+    padding-left: 15%;
+    padding-right: 15%;
+    padding-top: 100px;
+}
+
+/* About */
+#About h1{
+    color: black;
+    text-align: center;
+    font-weight: 400;
+    font-size: 40px;
+    padding-top: 200px;
+    padding-bottom: 50px;
+}
+
+#About h2{
+    color: black;
+    text-align: none;
+    font-weight: 400;
+    font-size: 35px;
+    padding-left: 15%;
+    padding-right: 15%;
+    padding-bottom: 5px;
+}
+
+#About h3{
+    color: black;
+    text-align: none;
+    font-weight: 300;
+    font-size: 25px;
+    padding-top: 5px;
+    padding-left: 15%;
+    padding-right: 15%;
+}
+
+#About p {
+    color: black;
+    text-align: justify;
+    font-weight: 300;
+    font-size: 20px;
+    padding-left: 15%;
+    padding-right: 15%;
+}
+
+.code-snippet{
+    background-color: #eee;
+    display: block;
+    margin-left: 15%;
+    margin-right: 15%;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    overflow-x: scroll;
+    overflow-y: hidden;
+}
+
+.snippet{
+    background-color: #eee;
+    color: rgba(0,0,0,0.8);
+}
+
+pre code {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    display: block;
+}
+
+#About img {
+    height: 700px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+
+}
+#About figcaption {
+    text-align: center;
+    font-weight: 100;
+    font-size: 20px;
+    padding-bottom: 100px;
+    padding-left: 15%;
+    padding-right: 15%;
+}
+
+#About ol {
+    text-align: start;
+    padding-left: 500px;
+    font-weight: 300;
+    font-size: 20px;
+}
+
+
+
+
+
+/* Team */
+
+#team {
+    padding-top: 200px;
+    padding-bottom: 50px;
+    color: #555;
+}
+
+#team h1 {
+    text-align: center;
+    color: black;
+    padding-bottom: 50px;
+    font-weight: 300;
+}
+
+#team p {
+    text-align: justify;
+    color: black;
+    padding-bottom: 50px;
+    font-weight: 300;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+h1::after {
+    content: '';
+    background: #007bff;
+    display: block;
+    height: 3px;
+    width: 170px;
+    margin: 20px auto 5px;
+
+}
+
+
+.profile-pic {
+    margin-top: 25px;
+
+}
+
+.profile-pic .img-box {
+    opacity: 1;
+    display: block;
+    position: relative;
+}
+
+.profile-pic .img-box img {
+    filter: grayscale(1);
+    height: 200px;
+    width: 225px;
+}
+
+.profile-pic .img-box img:hover {
+    filter: grayscale(0);
+    cursor: pointer;
+}
+
+.profile-pic h2 {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 15px;
+    color: #007bff!important;
+
+
+}
+
+
+.profile-pic h3 {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+#team .fa{
+    height: 25px;
+    width: 25px;
+    color: #007bff !important;
+    background: #fff;
+    padding: 4px;
+    border-radius: 50%;
+
+}
+
+.img-box ul {
+    padding: 15px 0;
+    position: absolute;
+    z-index: 2;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+}
+
+.img-box ul li {
+    padding:  5px;
+    display: inline-block;
+
+}
+
+.img-box:hover ul{
+    opacity:1;
+}
+
+.img-box ul, .img-box ul li {
+    transition: 0.5s
+}
+
+
+/* Contact */
+ #contact{
+     background: #efefef;
+     /* padding-bottom: 50px; */
+     color: #777;
+     padding-top: 100px;
+     padding-bottom: 100px;
+     margin-top: 50px;
+
+ }
+ #contact h1 {
+     text-align: center;
+     padding-bottom: 20px;
+ }
+/*
+ #contact .questions{
+     padding-top: 50px;
+ } */
+
+ #contact .fa{
+    height: 25px;
+    width: 25px;
+    color: #007bff !important;
+    background: #fff;
+    padding: 4px;
+    border-radius: 50%;
+
+}
+
+ #contact h3{
+    padding-top: 30px;
+    padding-bottom: 15px;
+}
+
+.social-media{
+    text-align: center;
+}
+
+#contact h5{
+    text-align: left;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    font-size: 20px;
+
+}
+
+#contact .twitter-timeline{
+    display: block;
+    align-content: center;
+    margin-left: center;
+    font-size: 1px;
+
+}
+
+
+#contact .twitter-follow-button{
+    display: block;
+    margin-left: 200px;
+    margin-top: 20px;
+}
+
+
+
+
+/* footer */
+#footer{
+    background: #333333;
+    color: #fff;
+    padding: 12px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    /* margin-top: 150px; */
+
+}
+
+.footer-text-trademark{
+    font-size: 15px;
+    font-weight: 100;
+    padding-top: 20px;
+    padding-bottom: 10px;
+    text-align: center;
+}
+
+.footer-text-copyright{
+    font-size: 15px;
+    font-weight: 50;
+    padding-top: 20px;
+    padding-bottom: 10px;
+    text-align: center;
+
+}
+
+.footer-links{
+    text-align: center;
+    /* padding-top: 100px; */
+}
+
+
+
+
+

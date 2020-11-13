@@ -19,7 +19,6 @@ Vue.use(Buefy)
 Vue.use(BootstrapVue)
 // Optionally install the BootstrapVue icon components plugin
 Vue.use(IconsPlugin)
-
 // Import the ZingGrid library, By default, the ZingGrid library registers itself as a web component.
 
 Vue.config.productionTip = false
