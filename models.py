@@ -3,6 +3,8 @@ from app import db, ma
 
 
 class getweights(db.Model):
+
+
     __tablename__ = 'weights'
 
     id = db.Column(db.Integer, primary_key=True)

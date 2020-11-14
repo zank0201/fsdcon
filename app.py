@@ -59,7 +59,7 @@ def weights_table():
 
     # convert dataframe to dictonary
     new_frame = portframe.to_dict('records')
-    # loop through index and add to data frame
+    # loop through index and add to data weights database
     for i in range(len(new_frame)):
         new_weights = models.getweights(alpha=new_frame[i]["Instrument"], weights=new_frame[i]['weights'])
         db.session.add(new_weights)
@@ -70,20 +70,32 @@ def weights_table():
 
 @app.route('/getweights/<rdate>/<mktIndexCode>/<indexCode>', methods=["GET"])
 def betas_table(rdate, mktIndexCode, indexCode):
+
+    '''
+    Function queries getweights database to input into GetBetasMktAndSpecVols function
+    :param rdate:
+    :param mktIndexCode:
+    :param indexCode:
+    :return: json output of Results table
+    '''
+    # Query getweights table to get weights and alpha
     IC_data = db.session.query(models.getweights.alpha)
     weight_data = db.session.query(models.getweights.weights)
-    # create empty list to add Instruments from database in list form
+
+    # create empty list to add Instruments and weights from database in list form
     ICs = []
     weights = []
     for i in IC_data:
         ICs.append(i[0])
     for i in weight_data:
         weights.append(i[0])
+
+    # create dictionary with instruments and weights
     dict_list = {'Instrument': ICs, 'weights': weights}
 
+    # convert dictionary to dataframe
     portframe = pd.DataFrame(dict_list)
 
-    print(portframe)
     # use output for function 2 paramaters
     mktVol, df = GetBetasMktAndSpecVols(rDate=rdate, ICs=ICs, mktIndexCode=mktIndexCode, portframe=portframe)
     # convert data frame to dictionary
@@ -91,6 +103,7 @@ def betas_table(rdate, mktIndexCode, indexCode):
     mktvol_data = mktVol.to_dict()
 
     # add to model and move to database
+
     for i in range(len(new_data)):
         my_new_result = models.Result(instrument=new_data[i]["Instrument"], beta=round(new_data[i]['Beta'], 3),
                                       unique_risk=round(new_data[i]['Unique Risk'], 3),
@@ -98,11 +111,13 @@ def betas_table(rdate, mktIndexCode, indexCode):
         db.session.add(my_new_result)
         db.session.commit()
 
+    # add to market volatility database table
+
     new_result = models.marketvol(mktvol=round(mktvol_data["Total Risk"], 3))
     db.session.add(new_result)
     db.session.commit()
 
-    # create list of data
+    # query all values in database
     results = models.Result.query.all()
 
     # serialize data
@@ -114,6 +129,11 @@ def betas_table(rdate, mktIndexCode, indexCode):
 @app.route('/getweights/stats')
 @cross_origin()
 def calcstats():
+    '''
+    Function calls calcstats function to get risk statistics
+    Convert matrices into csv files
+    :return: json output of portfolio variances
+    '''
     # access tables to get variables of function 3
     weights_data = db.session.query(models.Result.weights)
     betas_data = db.session.query(models.Result.beta)
@@ -167,7 +187,11 @@ def calcstats():
 
 @app.route("/getweights/getfiles", methods=["GET"])
 def list_files():
-    """Endpoint to list files on the server."""
+    '''
+    function zips csv files in matrices.zip and sent
+    to frontend to be downloaded
+    :return: zip file
+    '''
     # Zip file Initialization
     zipfolder = zipfile.ZipFile('Matrices.zip', 'w', compression=zipfile.ZIP_STORED)  # Compression type
 
@@ -184,16 +208,15 @@ def list_files():
                      as_attachment=True)
 
 
-@app.route("/getweights/getfiles/<path:path>", methods=["GET"])
-def get_file(path):
-    """Download a file."""
-    return send_from_directory(folder, path, as_attachment=True)
 
 
-# Get weights
 @app.route('/getweights/betas', methods=["GET"])
 @cross_origin()
 def weights():
+    '''
+    Function queries Results table to get beta values
+    :return: json output of beta values
+    '''
     betas_data = db.session.query(models.Result.beta)
     # create empty list for variables
     betas = []
@@ -207,6 +230,10 @@ def weights():
 @app.route('/getweights/alpha', methods=["GET"])
 @cross_origin()
 def alpha():
+    '''
+    Queries getweights model to get alpha values
+    :return: alpha
+    '''
     alpha_data = db.session.query(models.getweights.alpha)
 
     alpha = []
@@ -218,6 +245,11 @@ def alpha():
 @app.route("/getweights/piechart", methods=["GET"])
 @cross_origin()
 def piechart():
+    '''
+    Query weights and alpha values from getweights model
+
+    :return: json of weights and alpha to be used for piechart
+    '''
     alpha_data = db.session.query(models.getweights.alpha)
 
     alpha = []
@@ -230,11 +262,13 @@ def piechart():
         weights.append(i[0])
     for i in alpha_data:
         alpha.append(i[0])
-
+    # create dictionary of alpha and weights
     dict_list = {'name': alpha, 'value': weights}
 
+    # convert dictionary to dataframe
     newdate = pd.DataFrame(dict_list)
 
+    # jsonify dataframe
     result = newdate.to_json(orient='records')
     parsedresult = json.loads(result)
     output = json.dumps(parsedresult, indent=4)
@@ -245,38 +279,53 @@ def piechart():
 @app.route("/getweights/ics", methods=["POST"])
 @cross_origin()
 def timeseriesICs():
+    '''
+    Function gets market index code from frontend
+    :return: share codes to be used on frontend
+    '''
     data = request.get_json()
 
     mktIndexCode = data['mktIndex']
     ics = PortFolioIcs(mktIndexCode=mktIndexCode)
 
     output = json.dumps(ics)
-    print(type(output))
     return output
 
 
 @app.route("/getweights/ics/<mktIndex>", methods=["POST"])
 @cross_origin()
 def portfoliobetas(mktIndex):
+    '''
+    fucntion gets sharecode and weights from frontend to be pushed to database
+
+    :param mktIndex:
+    :return:
+    '''
+
+    # Delete tables
     db.session.query(models.getweights).delete()
     db.session.query(models.BetasTime).delete()
     db.session.query(models.RiskTime).delete()
     db.session.query(models.marketvol).delete()
 
+
     db.session.commit()
+
+    # request sharecodes and weights
     data = request.get_json()
     ics = data['selected']
     weights = data['weightslist']
     mktIndex = mktIndex
 
+    # use inputs to push to getweights model
     for i in range(len(ics)):
         new_model = models.getweights(alpha=ics[i], weights=weights[i])
         db.session.add(new_model)
         db.session.commit()
 
-    # dates, pfSysVols, pfSpecVols, pfVols = PortfolioRisk(ICs=ics, weights=weights, mktIndexCode=mktIndex)
+    # Call function to get portfolio
     newframe, mktframe = PortfolioBetasMktAndSpecVols(ICs=ics, weights=weights, mktIndexCode=mktIndex)
-    # betas_frame = PortfolioBetasMktAndSpecVol(ICs=ics, weights=weights, mktIndexCode=mktIndex)
+
     model_dict = newframe.to_dict('records')
     mktvol_dict = mktframe.to_dict('records')
     beta_data = []
@@ -301,6 +350,10 @@ def portfoliobetas(mktIndex):
 @app.route("/getweights/ics/dates", methods=["GET"])
 @cross_origin()
 def portfoliobetadates():
+    '''
+    functions gets dates of time series from database
+    :return: json output of dates
+    '''
     dates_data = db.session.query(models.BetasTime.dates)
 
     dates = []
@@ -312,6 +365,11 @@ def portfoliobetadates():
 @app.route("/getweights/ics/risk/<mktIndex>", methods=["POST"])
 @cross_origin()
 def portfolioRisk(mktIndex):
+    '''
+    function gets timeseries of risk values and pushes values to the database
+    :param mktIndex:
+    :return: json of dates
+    '''
     db.session.query(models.RiskTime).delete()
 
     mktVol_data = db.session.query(models.marketvol.mktvol)
@@ -345,6 +403,10 @@ def portfolioRisk(mktIndex):
 @app.route("/getweights/ics/risk/sysvols", methods=["GET"])
 @cross_origin()
 def riskSysVol():
+    '''
+    Query Portfolio Systematic Variance from database
+    :return: json of systematic variance
+    '''
     sysvols_data = db.session.query(models.RiskTime.pfSysVols)
 
     sysvols = []
@@ -359,6 +421,10 @@ def riskSysVol():
 @app.route("/getweights/ics/risk/pfvols", methods=["GET"])
 @cross_origin()
 def riskpfVols():
+    '''
+    Query Portfolio Variance from database
+    :return: json of portfolio variance
+    '''
     pfvols_data = db.session.query(models.RiskTime.pfVols)
 
     pfvols = []
@@ -373,6 +439,10 @@ def riskpfVols():
 @app.route("/getweights/ics/risk/pfspec", methods=["GET"])
 @cross_origin()
 def riskpfSpec():
+    '''
+    query portfolio specific variance from database
+    :return: json of specific variance
+    '''
     pfspec_data = db.session.query(models.RiskTime.pfSpecVols)
 
     pfspecs = []
@@ -388,7 +458,10 @@ def riskpfSpec():
 @app.route("/getweights/portfolio", methods=["POST"])
 @cross_origin()
 def icsTime():
-
+    '''
+    Function Gets time series of portfolio betas from functions
+    :return: json of dates
+    '''
     db.session.query(models.getweights).delete()
     db.session.query(models.BetasTime).delete()
     db.session.query(models.RiskTime).delete()
@@ -431,10 +504,6 @@ def icsTime():
 
     output = json.dumps(beta_data)
     return output
-
-
-
-
 
 
 
