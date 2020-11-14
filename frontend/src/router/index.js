@@ -1,17 +1,18 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Portfolio from '@/components/Portfolio'
+import IndexSummary from '@/components/IndexSummary'
 import HomePage from '@/components/HomePage'
-import Betas from '@/components/Betas'
+import Portfolio from '@/components/Portfolio'
+import PortfolioTime from '@/components/PortfolioTime'
 
 Vue.use(Router)
 
 export default new Router({
   routes: [
     {
-      path: '/Portfolio',
-      name: 'Portfolio',
-      component: Portfolio
+      path: '/IndexSummary',
+      name: 'IndexSummary',
+      component: IndexSummary
     },
     {
       path: '/',
@@ -19,9 +20,14 @@ export default new Router({
       component: HomePage
     },
     {
-      path: '/Betas',
-      name: 'Betas',
-      component: Betas
+      path: '/Portfolio',
+      name: 'Portfolio',
+      component: Portfolio
+    },
+    {
+      path: '/PortfolioTime',
+      name: 'PortfolioTime',
+      component: PortfolioTime
     }
 
   ]

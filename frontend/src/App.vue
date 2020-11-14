@@ -12,14 +12,18 @@
          <router-link class="nav-link" to="/">Home</router-link>
       </li>
       <li class="nav-item" wfd-id="468">
-        <router-link class="nav-link" to="/Portfolio">Portfolio</router-link>
+        <router-link class="nav-link" to="/IndexSummary">Index Summary</router-link>
       </li>
       <li class="nav-item" wfd-id="468">
-        <router-link class="nav-link" to="/Betas">Betas</router-link>
+        <router-link class="nav-link" to="/Portfolio">Portfolio</router-link>
+      </li>
+
+            <li class="nav-item" wfd-id="468">
+        <router-link class="nav-link" to="/PortfolioTime">Portfolio Time</router-link>
       </li>
 
       <li class="nav-item" wfd-id="467">
-        <a class="nav-link" href="#">About</a>
+        <a class="nav-link" href="http://fsd-documentation.s3-website.af-south-1.amazonaws.com/docs/build/html/index.html">About</a>
       </li>
 
     </ul>

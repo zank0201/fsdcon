@@ -3,7 +3,7 @@ from app import db, ma
 
 
 class getweights(db.Model):
-    __tablename__ = 'getweights'
+    __tablename__ = 'weights'
 
     id = db.Column(db.Integer, primary_key=True)
     alpha = db.Column(db.String())
@@ -43,7 +43,7 @@ class marketvol(db.Model):
 
 
 class BetasTime(db.Model):
-    __tablename__ = 'BetasTime'
+    __tablename__ = 'Betas Time'
 
     id = db.Column(db.Integer, primary_key=True)
     dates = db.Column(db.String())

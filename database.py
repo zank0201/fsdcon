@@ -204,32 +204,6 @@ def GetICSTime(indexCode):
     return newdata[["Year", "Quarter", "Alpha"]]
 
 
-def GetBetasTime(years, quarters, ICs, mktIndexCode):
-    '''
-    Function that gets betas accoding to year and quarter
-
-    :param years:
-    :param quarters:
-    :param ICs:
-    :param mktIndexCode:
-    :return: data frame of new date, Instrument and Beta
-    '''
-    Ba_Output = pd.read_csv("tbl_BA_Beta_Output.csv")
-    Ba_Output["Quarter"] = pd.to_datetime(Ba_Output["End Date"]).dt.quarter
-    Ba_Output["End Date"] = pd.to_datetime(Ba_Output["End Date"]).dt.strftime("%Y-%m")
-    Ba_Output["Year"] = pd.DatetimeIndex(Ba_Output["End Date"]).year
-
-    # find where year and quarter are the same
-    datetbl = Ba_Output.loc[Ba_Output["Quarter"].isin(quarters) & Ba_Output["Year"].isin(years)]
-    datetbl["NewDate"] = datetbl["Year"].map(str) + " - Q" + datetbl["Quarter"].map(str)
-    frame = datetbl.loc[datetbl["Instrument"] == ICs]
-    # Choose Market indexcode
-    betasframe = frame.loc[frame["Index"] == mktIndexCode]
-    betasframe['Beta'] = betasframe['Beta'].fillna(0)
-
-    return betasframe[["NewDate", "Beta"]]
-
-
 def PortfolioBetasMktAndSpecVols(ICs, weights, mktIndexCode):
     """
 
@@ -248,7 +222,7 @@ def PortfolioBetasMktAndSpecVols(ICs, weights, mktIndexCode):
     Ba_Output["End Date"] = pd.to_datetime(Ba_Output["End Date"]).dt.strftime("%Y-%m")
 
     datetbl = Ba_Output
-    mktframe = datetbl.loc[datetbl["Instrument"]==mktIndexCode]
+    mktframe = datetbl.loc[datetbl["Instrument"] == mktIndexCode]
     mkt_val = pd.Series(mktframe['Total Risk'].unique())
     mkt_val = mkt_val.tolist()
 
@@ -261,8 +235,6 @@ def PortfolioBetasMktAndSpecVols(ICs, weights, mktIndexCode):
     # df["New Date"] = pd.to_datetime(df["Date"]).dt.strftime("%Y-%m")
 
     dates = pd.Series(df['New Date'].unique())
-
-
 
     # Empty array of portfolio betas that we will append the portflio betas with the for-loop
     pfBetas = []
@@ -291,75 +263,76 @@ def PortfolioBetasMktAndSpecVols(ICs, weights, mktIndexCode):
 
 
 def PortfolioRisk(ICs, weights, mktIndexCode, mkt_val):
-  #read the data
-  Ba_Output = pd.read_csv("tbl_BA_Beta_Output.csv")
+    # read the data
+    Ba_Output = pd.read_csv("tbl_BA_Beta_Output.csv")
 
-  #adding quarter info
-  Ba_Output["Quarter"] = pd.to_datetime(Ba_Output["End Date"]).dt.quarter
-  #converting the dates to quarters
-  Ba_Output["End Date"] = pd.to_datetime(Ba_Output["End Date"]).dt.strftime("%Y-%m")
+    # adding quarter info
+    Ba_Output["Quarter"] = pd.to_datetime(Ba_Output["End Date"]).dt.quarter
+    # converting the dates to quarters
+    Ba_Output["Year"] = pd.DatetimeIndex(Ba_Output["End Date"]).year
+    Ba_Output["End Date"] = pd.to_datetime(Ba_Output["End Date"]).dt.strftime("%Y-%m")
 
-  datetbl = Ba_Output
-  frame = datetbl.loc[datetbl["Instrument"].isin(ICs)]
-  betasframe = frame.loc[frame["Index"]==mktIndexCode]
+    datetbl = Ba_Output
+    datetbl["New Date"] = datetbl["Year"].map(str) + " - Q" + datetbl["Quarter"].map(str)
+    frame = datetbl.loc[datetbl["Instrument"].isin(ICs)]
+    betasframe = frame.loc[frame["Index"] == mktIndexCode]
 
-  #create dataframe with instrument's beta values
-  df = betasframe[["Date","Instrument", "Beta", "Unique Risk", "Total Risk"]]
-  df["Date"] = pd.to_datetime(df["Date"]).dt.strftime("%Y-%m")
+    # create dataframe with instrument's beta values
+    df = betasframe[["New Date", "Instrument", "Beta", "Unique Risk", "Total Risk"]]
 
-  dates = pd.Series(df['Date'].unique())
+    dates = pd.Series(df['New Date'].unique())
 
-  #Empty array of portfolio risk statistics that we will append the portflio betas with the for-loop
-  pfSysVols = []
-  pfSpecVols = []
-  pfVols = []
-  i = 0
+    # Empty array of portfolio risk statistics that we will append the portflio betas with the for-loop
+    pfSysVols = []
+    pfSpecVols = []
+    pfVols = []
+    i = 0
 
-  for date, group in df.groupby('Date'):
-    #Instrument Betas per quarter
-    nump_betas = np.array(group['Beta'])
-    #Instrument Betas enetered by user - (Weights is defined in the previous cell)
-    nump_weights = np.array(weights)
+    for date, group in df.groupby('New Date'):
+        # Instrument Betas per quarter
+        nump_betas = np.array(group['Beta'])
+        # Instrument Betas enetered by user - (Weights is defined in the previous cell)
+        nump_weights = np.array(weights)
 
-    #Calculation portfolio betas through time
-    nump_weights= nump_weights.reshape(len(nump_weights),1)
-    nump_betas = nump_betas.reshape(len(nump_betas),1)
+        # Calculation portfolio betas through time
+        nump_weights = nump_weights.reshape(len(nump_weights), 1)
+        nump_betas = nump_betas.reshape(len(nump_betas), 1)
 
-    weights_trans = nump_weights.transpose()
+        weights_trans = nump_weights.transpose()
 
-    pfBetas = weights_trans.dot(nump_betas)
-    betas_trans = nump_betas.transpose()
+        pfBetas = weights_trans.dot(nump_betas)
+        betas_trans = nump_betas.transpose()
 
-    m =(mkt_val[i])
+        m = (mkt_val[i])
 
+        # Systematic Covariance Matrix
+        sysCov = nump_betas.dot(betas_trans) * (m ** 2)
 
-    #Systematic Covariance Matrix
-    sysCov = nump_betas.dot(betas_trans)*(m**2)
+        # Portfolio Systematic Variance
+        pfSysVol = ((((weights_trans.dot(nump_betas)).dot(betas_trans)).dot(nump_weights)) * (m * 2)).flatten()[0]
 
-    #Portfolio Systematic Variance
-    pfSysVol = ((((weights_trans.dot(nump_betas)).dot(betas_trans)).dot(nump_weights)) * (m*2)).flatten()[0]
+        # Specific CoVariance matrix
+        nump_specVols = np.array(group["Unique Risk"].fillna(0))
+        specCov = (np.diag(nump_specVols)) ** 2
 
-    #Specific CoVariance matrix
-    nump_specVols=np.array(group["Unique Risk"].fillna(0))
-    specCov= (np.diag(nump_specVols))**2
+        # Portfolio specific variance
+        pfSpecVol = ((weights_trans.dot(specCov)).dot(nump_weights)).flatten()[0]
 
-    #Portfolio specific variance
-    pfSpecVol = ((weights_trans.dot(specCov)).dot(nump_weights)).flatten()[0]
+        # Total Covariance matrix
+        totCov = ((nump_betas.dot(betas_trans)) * (m ** 2)) + specCov
 
-    #Total Covariance matrix
-    totCov = ((nump_betas.dot(betas_trans)) * (m**2)) + specCov
+        # Portfolio Variance
+        pfVol = (((((weights_trans.dot(nump_betas)).dot(betas_trans)).dot(nump_weights)) * (m ** 2)) + (
+            (weights_trans.dot(specCov)).dot(nump_weights))).flatten()[0]
 
-    #Portfolio Variance
-    pfVol = (((((weights_trans.dot(nump_betas)).dot(betas_trans)).dot(nump_weights)) * (m**2)) + ((weights_trans.dot(specCov)).dot(nump_weights))).flatten()[0]
+        # Appending portfolio beta to an empty array pfBetas
 
-    #Appending portfolio beta to an empty array pfBetas
+        pfSysVols.append(pfSysVol)
+        pfSpecVols.append(pfSpecVol)
+        pfVols.append(pfVol)
+        i += 1
 
-    pfSysVols.append(pfSysVol)
-    pfSpecVols.append(pfSpecVol)
-    pfVols.append(pfVol)
-    i +=1
-
-  return dates, pfSysVols, pfSpecVols, pfVols
+    return dates, pfSysVols, pfSpecVols, pfVols
 
 
 def PortFolioIcs(mktIndexCode):
@@ -383,3 +356,161 @@ def PortFolioIcs(mktIndexCode):
     return ics_list
 
 
+def GetICSTime(indexCode):
+    tbl_Index_Constituents = pd.read_csv("tbl_Index_Constituents.csv")
+    # Remove timestamp from date column and return quarter and yar from date column
+    tbl_Index_Constituents["Quarter"] = pd.to_datetime(tbl_Index_Constituents["Date"]).dt.quarter
+    tbl_Index_Constituents["Date"] = pd.to_datetime(tbl_Index_Constituents["Date"]).dt.strftime("%Y-%m")
+    tbl_Index_Constituents["Year"] = pd.DatetimeIndex(tbl_Index_Constituents["Date"]).year
+
+    # Get ICS ensuring same membership
+
+    ics = ["LRGC", "MIDC", "SMLC"]
+    if indexCode == "FLED":
+        newindex = 'ALSI'
+    elif indexCode in ics:
+        newindex = 'Index'
+    else:
+        newindex = indexCode
+    newdata = tbl_Index_Constituents[tbl_Index_Constituents[newindex + " New"] == newindex]
+
+    # Get market index code from indexcode
+    if indexCode == 'ALSI':
+        mktIndexCode = 'J203'
+    elif indexCode == 'TOPI':
+        mktIndexCode = 'J200'
+    elif indexCode == 'RESI':
+        mktIndexCode = 'J258'
+    elif indexCode == 'FINI':
+        mktIndexCode = 'J250'
+    elif indexCode == 'INDI':
+        mktIndexCode = 'J257'
+
+    # Select column with Index Code
+    total = newdata["Gross Market Capitalisation"].sum(axis=0)
+    # return weights
+    newdata["weights"] = newdata["Gross Market Capitalisation"] / total
+    # newdata.fillna(0)
+    # ICs = newdata[["Alpha"]]
+    # weights = newdata[["weights"]]
+
+    icsFrame = newdata[["Alpha", "weights"]]
+    icsFrame.rename(columns={'Alpha': 'Instrument'}, inplace=True)
+    return icsFrame, mktIndexCode
+
+
+def GetBetasTime(mktIndexCode, icsFrame):
+    Ba_Output = pd.read_csv("tbl_BA_Beta_Output.csv")
+    Ba_Output["Quarter"] = pd.to_datetime(Ba_Output["End Date"]).dt.quarter
+    Ba_Output["End Date"] = pd.to_datetime(Ba_Output["End Date"]).dt.strftime("%Y-%m")
+    Ba_Output["Year"] = pd.DatetimeIndex(Ba_Output["End Date"]).year
+
+    datetbl = Ba_Output
+
+    datetbl["New Date"] = datetbl["Year"].map(str) + " - Q" + datetbl["Quarter"].map(str)
+    frame = datetbl.loc[datetbl["Instrument"].isin(icsFrame.Instrument)]
+
+    frame = pd.merge(frame, icsFrame, on='Instrument')
+    betasframe = frame.loc[frame["Index"] == mktIndexCode]
+
+    betasframe['Beta'] = betasframe['Beta'].fillna(0)
+    betasframe['Unique Risk'] = betasframe['Unique Risk'].fillna(0)
+    dates = pd.Series(betasframe['New Date'].unique())
+
+    new_frame = betasframe[["New Date", "Instrument", "Beta", "Unique Risk", "Total Risk", "weights"]]
+    # print(df)
+    mktframe = datetbl.loc[datetbl["Instrument"] == mktIndexCode]
+    mkt_val = pd.Series(mktframe['Total Risk'].unique())
+    mkt_val = mkt_val.tolist()
+    return new_frame, mkt_val
+
+
+def PortfolioBetasTime(new_frame):
+    # read the data
+
+    dates = pd.Series(new_frame['New Date'].unique())
+    print(dates)
+
+    # Empty array of portfolio betas that we will append the portflio betas with the for-loop
+    pfBetas = []
+
+    for date, group in new_frame.groupby('New Date'):
+        # Instrument Betas per quarter
+        nump_betas = np.array(group['Beta'])
+
+        # Instrument Betas enetered by user - (Weights is defined in the previous cell)
+        nump_weights = np.array(group['weights'])
+
+        # Calculation portfolio betas through time
+        nump_weights = nump_weights.reshape(len(nump_weights), 1)
+        nump_betas = nump_betas.reshape(len(nump_betas), 1)
+
+        weights_trans = nump_weights.transpose()
+
+        pfBeta = weights_trans.dot(nump_betas).flatten()[0]
+        # Appending portfolio beta to an empty array pfBetas
+        pfBetas.append(pfBeta)
+
+    dict_list = {'Dates': dates, 'pfBeta': pfBetas}
+    betasframe = pd.DataFrame(dict_list)
+    return betasframe
+
+
+
+def RiskTime(new_frame, mkt_val):
+    dates = pd.Series(new_frame['New Date'].unique())
+
+    # Empty array of portfolio risk statistics that we will append the portflio betas with the for-loop
+    pfSysVols = []
+    pfSpecVols = []
+    pfVols = []
+    i = 0
+    for date, group in new_frame.groupby('New Date'):
+        # Instrument Betas per quarter
+        nump_betas = np.array(group['Beta'])
+        # Instrument Betas enetered by user - (Weights is defined in the previous cell)
+        nump_weights = np.array(group['weights'])
+
+        # Calculation portfolio betas through time
+        nump_weights = nump_weights.reshape(len(nump_weights), 1)
+
+        nump_betas = nump_betas.reshape(len(nump_betas), 1)
+
+        weights_trans = nump_weights.transpose()
+
+        pfBetas = weights_trans.dot(nump_betas)
+        betas_trans = nump_betas.transpose()
+
+        m = (mkt_val[i])
+
+        i += 1
+
+        # Systematic Covariance Matrix
+        sysCov = nump_betas.dot(betas_trans) * (m ** 2)
+
+        # Portfolio Systematic Variance
+        pfSysVol = ((((weights_trans.dot(nump_betas)).dot(betas_trans)).dot(nump_weights)) * (m * 2)).flatten()[0]
+
+        # Specific CoVariance matrix
+        nump_specVols = np.array(group["Unique Risk"].fillna(0))
+        specCov = (np.diag(nump_specVols)) ** 2
+
+        # Portfolio specific variance
+        pfSpecVol = ((weights_trans.dot(specCov)).dot(nump_weights)).flatten()[0]
+
+        # Total Covariance matrix
+        totCov = ((nump_betas.dot(betas_trans)) * (m ** 2)) + specCov
+
+        # Portfolio Variance
+        pfVol = (((((weights_trans.dot(nump_betas)).dot(betas_trans)).dot(nump_weights)) * (m ** 2)) + (
+            (weights_trans.dot(specCov)).dot(nump_weights))).flatten()[0]
+
+        # Appending portfolio beta to an empty array pfBetas
+
+        pfSysVols.append(pfSysVol)
+        pfSpecVols.append(pfSpecVol)
+        pfVols.append(pfVol)
+
+    # dict_list = {'Dates': dates, 'pfSysVols': pfSysVols, 'pfSpecVols': pfSpecVols, 'pfVols':pfVols}
+    # RiskFrame = pd.DataFrame(dict_list)
+    return dates, pfSysVols, pfSpecVols, pfVols

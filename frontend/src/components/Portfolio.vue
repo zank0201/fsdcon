@@ -1,310 +1,339 @@
-
 <template>
-<!--    input date-->
-<div>
-  <!-- Image and text -->
-
-  <b-form v-show="isShown" @submit.prevent="GetIcs">
-
-      <b-form-group id="input-group-1"
-  label="Please select a date"
-  label-for="rdate">
+ <div>
+      <b-form v-show="step===1" @submit.prevent="GetIcs">
+   <b-form-group id="input-group-1"
+  label="Please select the market index code"
+  label-for="mktIndex">
     <b-form-select
-      name="rdate"
-      id="rdate"
-      v-model="rdate"
-      :options="['2017-09', '2017-12', '2018-03', '2018-06', '2018-09', '2018-12', '2019-03', '2019-06', '2019-09', '2019-12', '2020-03', '2020-06']"
+      name="mktIndex"
+      id="mktIndex"
+      v-model="mktIndex"
+      :options="['J200', 'J203',
+        'J250', 'J257', 'J258']"
       required></b-form-select>
   </b-form-group>
+        <div>
+              <button>Next</button>
+     </div>
+   </b-form>
 
-  <b-form-group id="input-group-2"
-  label="Please select an index code"
-  label-for="indexcode">
+   <b-form v-show="step===2">
+      <b-form-group id="input-group-2"
+  label="Please select a Share"
+  label-for="shareCode">
     <b-form-select
-      name="indexcode"
-      id="indexcode"
-      v-model="indexCode"
-      :options="['ALSI', 'TOPI',
-        'RESI', 'FINI', 'INDI']"
+      name="sharecode"
+      id="sharecode"
+      v-model="selected"
+      :options= "shareCode"
+      multiple :select-size="4"
       required></b-form-select>
+        <div class="mt-3">Selected: <strong>{{ selected }}</strong></div>
 
   </b-form-group>
-
-    <div>
-      <button v-on:click="isShown = !isShown">Submit</button>
+     <div class="mt-3">
+      <div>
+      <button @click.prevent="next">Next</button>
+     </div>
+     </div>
+     <div class="mt-3">
+     <div>
+      <button @click.prevent="prev">Back</button>
+     </div>
      </div>
 
-</b-form>
-<div v-show="!isShown">
-<!--    Graphs-->
-    <div class="row">
-        <div class="col-md-6">
-          <chart :options="ChartOptionsBar"></chart>
-        </div>
-        <div class="col-md-6">
-            <chart :options="ChartOptionsPie"></chart>
-        </div>
-    </div>
+   </b-form>
+   <b-form v-show="step===3" >
+     <div v-show="this.addList<this.selected.length">
+     <b-form-input v-model.number="weightsVals"
+     type="float"
+     placeholder="Please insert a weight"
+     aria-describedby="input-live-help">
+     </b-form-input>
+     </div>
+     <p v-show="incorrect===true">The weights do not add up to zero, please enter the correct weights</p>
+           <div>
+      <button v-show="this.addList<this.selected.length" @click="addWeights">Add</button>
+             <div class="mt-3">Selected ShareCode: <strong>{{selected}}</strong></div>
+             <div class="mt-3">Added weights: <strong>{{weightslist}}</strong></div>
+     </div>
 
-<!--    Graphs of function 3 and 2-->
-
-      <zing-grid
-    ref="myGrid"
-    caption="Portfolio Summary"
-    layout="row"
-    viewport-stop
-    :data.prop="allbetas"
-    filter sort pager
-  >
-    <zg-colgroup>
-      <zg-column index="instrument" header="Share"></zg-column>
-      <zg-column index="beta" header="Beta"></zg-column>
-      <zg-column index="unique_risk" header="Unique Risk"></zg-column>
-      <zg-column index = 'total_risk' header="Total Risk"></zg-column>
-
-    </zg-colgroup>
-  </zing-grid>
-
-<!--      function 3-->
-
-    <zing-grid
-    ref="newGrid"
-    caption="Portfolio stats"
-    layout="row"
-    viewport-stop
-    :data.prop="statsvals"
-    filter sort pager
-      >
-<!--        table starts-->
-
-        <zg-column index='pfBetas' header="Portfolio betas"></zg-column>
-        <zg-column index='pfSysVol' header="Portfolio Systematic Variance"></zg-column>
-        <zg-column index="pfSpecVol" header="Portfolio Specific Variance"></zg-column>
-        <zg-column index="pfVol" header="Portfolio Variance"></zg-column>
-    </zing-grid>
-  <div class="row justify-content-between">
+       <div class="mt-3">
     <div class="col-4">
-      <button @click="downloadfiles">Download Files</button>
+     <button @click.prevent="prev">Back</button>
     </div>
-    <div class="col-4">
-     <button v-on:click="isShown = !isShown">Restart</button>
-    </div>
-  </div>
-  <div>
-
+       </div>
+<div class="mt-3">
+         <div>
+           <button v-show="this.addList===this.selected.length" @click.prevent="checkweights">Done</button>
+         </div>
 </div>
 
-  </div>
+   </b-form>
+
+<div class="row">
+        <div class="col-md-6">
+          <chart :options="chartOptionsLine"></chart>
+        </div>
+
 </div>
+   <div class="row">
+        <div class="col-md-6">
+          <chart :options="chartRisks"></chart>
+        </div>
+
+</div>
+      <b-row align-h="center" v-show="showbutton">
+          <div>
+       <button  @click.prevent="reset">Clear</button>
+         </div>
+      </b-row>>
+
+  </div>
+
 </template>
-
 <script>
-// eslint-disable-next-line no-unused-vars
-import Zingrid from 'zinggrid'
 import axios from 'axios'
+import PortfolioTime from './PortfolioTime'
 
 export default {
-
+  name: 'Portfolio',
+  components: {
+    PortfolioTime
+  },
   data () {
     return {
-
-      show: true,
-      rdate: '2017-09',
-      indexCode: 'ALSI',
-      // mktIndex: 'J200',
-      allbetas: [],
-      statsvals: [],
-      allweights: [],
-      allalphas: [],
-      alphaweights: [],
-      ChartOptionsBar: {},
-      ChartOptionsLine: {},
-      ChartOptionsPie: {},
-      isShown: true
+      selected: [],
+      betalist: [],
+      dates_list: [],
+      title: 'Betas',
+      shareCode: [],
+      nextId: 1,
+      weightslist: [],
+      weightsVals: '',
+      mktIndex: 'J200',
+      addList: 0,
+      step: 1,
+      incorrect: false,
+      chartOptionsLine: {},
+      chartRisks: {},
+      risk_dates: [],
+      showbutton: true,
+      risk_sysvols: [],
+      risk_pfvols: [],
+      risk_pfspec: [],
+      allbetas: []
 
     }
   },
-  mounted () {
-    // this.$refs.myGrid.setData(this.allweights)
-    // this.$refs.newGrids.setData(this.statsvals)
-  },
   methods: {
-    downloadfiles () {
-      axios({url:
-          'http://localhost:5000/getweights/getfiles',
-      method: 'GET',
-      responseType: 'blob'})
-        .then((response) => {
-          console.log(response.data)
-          const url = window.URL.createObjectURL(new Blob([response.data]))
-          const link = document.createElement('a')
-          link.href = url
-          link.setAttribute('download', 'Matrices.zip') // or any other extension
-          document.body.appendChild(link)
-          link.click()
-        })
-    },
-    getweights () {
-      axios.get('http://localhost:5000/getweights/betas')
-        .then((response) => {
-          this.allweights = response.data
-          this.getalphas()
-        })
-    },
-    getalphas () {
-      axios.get('http://localhost:5000/getweights/alpha')
-        .then((response) => {
-          this.allalphas = response.data
-          this.getpie()
-        })
-    },
-    getpie () {
-      axios.get('http://localhost:5000/getweights/piechart')
-        .then((response) => {
-          this.alphaweights = response.data
-          this.plotWeights()
-        })
-    },
-
-    getstats () {
-      axios.get('http://localhost:5000/getweights/stats')
-        .then((response) => {
-          console.log(response)
-          this.statsvals = response.data
-          return this.statsvals
-        })
-    },
-
     GetIcs () {
+      this.step++
       const formdata = {
-        rdate: this.rdate,
-        indexCode: this.indexCode
+        mktIndex: this.mktIndex
         // mktIndex: this.mktIndex
 
       }
-      console.log(this.indexCode)
-      axios.post('http://localhost:5000/getweights', formdata, {crossdomain: true})
+      console.log(formdata)
+      console.log(this.mktIndex)
+      axios.post('http://localhost:5000/getweights/ics', formdata, {crossdomain: true})
         // eslint-disable-next-line no-unused-vars
         .then(response => {
-          this.allbetas = response.data
-          console.log(this.allbetas.beta)
-          this.getstats()
-          this.getweights()
           console.log(response)
+          this.shareCode = response.data
+          // this.shareCode = this.shareCode.replace(/"/g, "'")
           // return this.allweights
         })
-        .catch(error => console.log(error))
     },
-
-    plotWeights () {
-      this.ChartOptionsBar = {
-        xAxis: {
-          // eslint-disable-next-line
-          data: this.allalphas,
-          type: 'category',
-          axisLabel: {
-            show: true,
-            textStyle: {
-              color: 'black'
-            },
-            interval: 0,
-            rotate: 90
-          }
-        },
-        yAxis: {
-          type: 'value'
-        },
-        series: [{
-          data: this.allweights,
-          type: 'bar',
-          align: 'center',
-          color: '#0099FF',
-          showBackground: true,
-          backgroundStyle: {
-            color: 'rgba(220, 220, 220, 0.8)'
-          }
-
-        }],
-        title: {
-          text: this.indexCode + ' Constituent Betas',
-          x: 'center',
-          textStyle: {
-            fontSize: 24
-          }
-        }
+    // previous page method
+    prev () {
+      this.step--
+      if (this.step === 2) {
+        this.weightslist = []
+        this.selected = []
+      } else if (this.step === 1) {
+        this.selected = []
+        this.shareCode = 'J200'
       }
+    },
+    // next page method
+    next () {
+      this.step++
+    },
+    GetIndex () {
 
-      this.ChartOptionsPie = {
+    },
+    reset () {
+      this.selected = []
+      this.betalist = []
+      this.dates_list = []
+      this.shareCode = []
+      this.nextId = 1
+      this.weightslist = []
+      this.weightsVals = ''
+      this.mktIndex = 'J200'
+      this.addList = 0
+      this.step = 1
+      this.incorrect = false
+      this.chartOptionsLine = {}
+      this.chartRisks = {}
+      this.risk_dates = []
+      this.showbutton = true
+      this.risk_sysvols = []
+      this.risk_pfvols = []
+      this.risk_pfspec = []
+    },
+    addWeights () {
+      // check number of weights added
+      console.log('weights: ' + this.weightslist)
+      this.addList++
+      this.weightslist.push(
+        this.weightsVals)
+      this.weightsVals = ''
+    },
+    checkweights () {
+      const total = this.weightslist.reduce((a, b) => a + b, 0)
+      console.log(total)
+      // eslint-disable-next-line eqeqeq
+      if (total == 1) {
+        this.step++
+        this.portfolioBeta()
+      } else {
+        this.weightslist = []
+        this.addList = 0
+        this.incorrect = true
+      }
+    },
+    portfolioBeta () {
+      const formdata = {
+        mktIndex: this.mktIndex,
+        weightslist: this.weightslist,
+        selected: this.selected
+      }
+      axios.post('http://localhost:5000/getweights/ics/' + this.mktIndex, formdata, {crossdomain: true})
+        .then(response => {
+          this.betalist = response.data
+          this.portfolioDates()
+        })
+    },
+    portfolioDates () {
+      axios.get('http://localhost:5000/getweights/ics/dates')
+        .then(response => {
+          this.dates_list = response.data
+          this.incorrect = false
+          this.riskDates()
+          this.plotBeta()
+        })
+    },
+    riskDates () {
+      axios.post('http://localhost:5000/getweights/ics/risk/' + this.mktIndex, {crossdomain: true})
+        .then(response => {
+          console.log(response.data)
+          this.risk_dates = response.data
+          this.riskSysVol()
+        })
+    },
+    riskSysVol () {
+      axios.get('http://localhost:5000/getweights/ics/risk/sysvols')
+        .then(response => {
+          this.risk_sysvols = response.data
+          this.riskPfVols()
+          console.log(response.data)
+        })
+    },
+    riskPfVols () {
+      axios.get('http://localhost:5000/getweights/ics/risk/pfvols')
+        .then(response => {
+          this.risk_pfvols = response.data
+          this.riskPfSpec()
+        })
+    },
+    riskPfSpec () {
+      axios.get('http://localhost:5000/getweights/ics/risk/pfspec')
+        .then(response => {
+          this.risk_pfspec = response.data
+          this.plotRisks()
+        })
+    },
+    plotRisks () {
+      this.chartRisks = {
         title: {
-          text: this.indexCode + ' Constituent Weights',
-          // left: 'center',
+          text: 'Portfolio Risks',
           x: 'center',
           textStyle: {
             fontSize: 24
           }
         },
         tooltip: {
-          trigger: 'item',
-          formatter: this.allalphas
+          trigger: 'axis'
         },
-        // legend: {
-        //   type: 'scroll',
-        //   orient: 'vertical',
-        //   show: true,
-        //   right: 'auto',
-        //   left: 'auto',
-        //   top: 'auto',
-        //   bottom: 'auto',
-        //   data: this.alphaweights,
-        //   selected: this.alphaweights.selected
-        // },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        toolbox: {
+          feature: {
+            saveAsImage: {}
+          }
+        },
+        legend: {},
+        xAxis: {
+          type: 'category',
+          data: this.risk_dates
+        },
+        yAxis: {
+          type: 'value'
+        },
         series: [
           {
-            name: '',
-            type: 'pie',
-            radius: '40%',
-            // radius: ['55%', '70%'],
-            // avoidoverlap: false,
-            center: ['40%', '60%'],
-            data: this.alphaweights,
-            // animation: true,
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 5,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
-              }
-              // label: {
-              //   show: true,
-              //   fontSize: '10'
-              //   // fontWeight: 'bold'
-              // }
-            },
-            // labelLine: {
-            //   show: false
-            // },
-            // label: {
-            //   position: 'outer',
-            //   alignTo: 'none',
-            //   bleedMargin: 0,
-            // },
-            left: '40%',
-            right: '40%',
-            align: 'centre',
-            top: 'auto',
-            bottom: 'auto',
-            height: 400,
-            width: 400
+            name: 'Portfolio Systemic Variance',
+            type: 'line',
+            data: this.risk_sysvols
+          },
+          {
+            name: 'Portfolio Variance',
+            type: 'line',
+            data: this.risk_pfvols
+          },
+          {
+            name: 'Portfolio Specific Variance',
+            type: 'line',
+            data: this.risk_pfspec
           }
         ]
       }
+    },
+    plotBeta () {
+      this.chartOptionsLine = {
+        xAxis: {
+          data: this.dates_list
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            type: 'line',
+            data: this.betalist
+          }
+        ],
+        title: {
+          text: 'Portfolio Betas',
+          x: 'center',
+          textStyle: {
+            fontSize: 24
+          }
+        },
+        color: ['#127ac2']
+      }
     }
   }
-
 }
+
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 form {
   margin: 2rem auto;
@@ -359,9 +388,4 @@ button:active {
   background-color: #002350;
 }
 
-/*jumbotron {*/
-/*  text-align: center;*/
-/*  align-items: center;*/
-/*  alignment: center;*/
-/*}*/
 </style>

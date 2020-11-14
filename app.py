@@ -36,20 +36,25 @@ import models
 @app.route("/getweights", methods=["POST", "GET"])
 @cross_origin()  # allow all origins all methods.
 def weights_table():
+    '''
+    Function takes in dates and index codes from frontend
+    and pushes weights and alpha values to the the database
+    :return: redirects to betas_table function
+    '''
     # delete tables as something is posted
     db.session.query(models.Result).delete()
     db.session.query(models.getweights).delete()
     db.session.query(models.marketvol).delete()
     db.session.commit()
 
-    # take inputs from front end form
+    # date input form frontend
     data = request.get_json()
     rdate = data['rdate']
 
+    # index code input from frontend
     indexCode = data['indexCode']
-    # mktIndexCode = data['mktIndex']
-    # add as parameters to getICS
-    # call function one
+
+    # call function to get weights, alphas and market index code
     portframe, mktIndexCode = GetICsAndWeight(rDate=rdate, indexCode=indexCode)
 
     # convert dataframe to dictonary
@@ -239,7 +244,7 @@ def piechart():
 
 @app.route("/getweights/ics", methods=["POST"])
 @cross_origin()
-def timeseriesBetas():
+def timeseriesICs():
     data = request.get_json()
 
     mktIndexCode = data['mktIndex']
@@ -274,19 +279,19 @@ def portfoliobetas(mktIndex):
     # betas_frame = PortfolioBetasMktAndSpecVol(ICs=ics, weights=weights, mktIndexCode=mktIndex)
     model_dict = newframe.to_dict('records')
     mktvol_dict = mktframe.to_dict('records')
-
+    beta_data = []
 
     for i in range(len(model_dict)):
         new_model = models.BetasTime(dates=model_dict[i]['Dates'], beta=model_dict[i]['pfBeta'])
+        beta_data.append(round(model_dict[i]['pfBeta'], 3))
         db.session.add(new_model)
         db.session.commit()
         # Once post is completed, redirect to betas output
-    beta_data = []
+
 
     for i in range(len(mktvol_dict)):
 
         mkt_model = models.marketvol(mktvol=round(mktvol_dict[i]['Total Risk'], 3))
-        beta_data.append(round(mktvol_dict[i]['Total Risk'], 3))
         db.session.add(mkt_model)
         db.session.commit()
     #
@@ -380,8 +385,52 @@ def riskpfSpec():
     return output
 
 
+@app.route("/getweights/portfolio", methods=["POST"])
+@cross_origin()
+def icsTime():
 
+    db.session.query(models.getweights).delete()
+    db.session.query(models.BetasTime).delete()
+    db.session.query(models.RiskTime).delete()
+    db.session.query(models.marketvol).delete()
+    data = request.get_json()
 
+    IndexCode = data['indexCode']
+    icsFrame, mktIndexCode = GetICSTime(indexCode=IndexCode)
+    new_frame, mkt_val = GetBetasTime(mktIndexCode=mktIndexCode, icsFrame=icsFrame)
+    # mktvol_dict = mkt_val.to_dict('records')
+    # new_data = new_frame.to_dict('records')
+
+    # Get portfolio betas and dates and push to db
+    betasframe = PortfolioBetasTime(new_frame=new_frame)
+    new_data = betasframe.to_dict('records')
+    beta_data = []
+
+    for i in range(len(new_data)):
+
+        new_model = models.BetasTime(dates=new_data[i]['Dates'], beta=round(new_data[i]['pfBeta'],4))
+        beta_data.append(round(new_data[i]['pfBeta'], 4))
+        db.session.add(new_model)
+        db.session.commit()
+
+    # Push  market volatility
+    for i in range(len(mkt_val)):
+
+        mkt_model = models.marketvol(mktvol=round(mkt_val[i], 3))
+        db.session.add(mkt_model)
+        db.session.commit()
+
+    # Get portfolio risk values and push to db
+    dates, pfSysVols, pfSpecVols, pfVols = RiskTime(new_frame=new_frame, mkt_val = mkt_val)
+
+    for i in range(len(pfVols)):
+        new_model = models.RiskTime(dates=dates[i], pfSysVols=round(pfSysVols[i],4),
+                                    pfSpecVols=round(pfSpecVols[i],4), pfVols=round(pfVols[i],4))
+        db.session.add(new_model)
+        db.session.commit()
+
+    output = json.dumps(beta_data)
+    return output
 
 
 
