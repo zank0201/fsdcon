@@ -17,8 +17,9 @@
     class="mb-2"
   >
     <b-card-text>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Gravida arcu ac tortor dignissim convallis. Sed viverra ipsum nunc aliquet bibendum enim facilisis gravida. Bibendum ut tristique et egestas quis ipsum suspendisse.
-        Sed turpis tincidunt id aliquet risus feugiat in ante.
+      Choose a specific index to use as benchmark when comparing stock performance. You can search for any stock and
+      retrieve information on that stock, such as its Beta, Unique Risk, Total Risk and its constituent weight in a particular index.
+      You can also have access to downloadable covariance matrices to view the co-movements between all the indices.
     </b-card-text>
     <div class="mt-3">
       <b-button variant="primary" :to="'IndexSummary'">Index Summary</b-button>
@@ -32,11 +33,11 @@
     class="mb-2"
   >
     <b-card-text>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Gravida arcu ac tortor dignissim convallis. Sed viverra ipsum nunc aliquet bibendum enim facilisis gravida. Bibendum ut tristique et egestas quis ipsum suspendisse.
-        Sed turpis tincidunt id aliquet risus feugiat in ante.
+      Create a portfolio based on weights and stocks of your choice. You can then track
+      the performance of the beta, Systematic risk, the specific variance and total risk of your portfolio over time.
     </b-card-text>
     <div class="mt-3">
-      <b-button variant="primary" :to="'Portfolio'">Portfolio</b-button>
+      <b-button variant="primary" :to="'Portfolio'">Create your Portfolio</b-button>
     </div>
   </b-card>
 
@@ -47,8 +48,8 @@
     class="mb-2"
   >
     <b-card-text>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Gravida arcu ac tortor dignissim convallis. Sed viverra ipsum nunc aliquet bibendum enim facilisis gravida. Bibendum ut tristique et egestas quis ipsum suspendisse.
-        Sed turpis tincidunt id aliquet risus feugiat in ante.
+     The portfolio summary allows you to track the performance of the portfolio of your chosen index over time. You can then track
+      the performance of the beta, Systematic risk, the specific variance and total risk.
     </b-card-text>
     <div class="mt-3">
       <b-button variant="primary" :to="'PortfolioTime'">Portfolio Summary</b-button>
@@ -68,5 +69,8 @@ export default {
 </script>
 
 <style scoped>
+  .jumbotron {
+    text-align: center;
+  }
 
 </style>

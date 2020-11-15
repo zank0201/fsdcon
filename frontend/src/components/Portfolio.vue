@@ -1,5 +1,6 @@
 <template>
  <div>
+
       <b-form v-show="step===1" @submit.prevent="GetIcs">
    <b-form-group id="input-group-1"
   label="Please select the market index code"
@@ -70,24 +71,26 @@
 </div>
 
    </b-form>
+<b-row align-h="center">
 
-<div class="row">
         <div class="col-md-6">
           <chart :options="chartOptionsLine"></chart>
         </div>
 
-</div>
-   <div class="row">
+  </b-row>
+
+<b-row align-h="center">
         <div class="col-md-6">
           <chart :options="chartRisks"></chart>
         </div>
 
-</div>
+</b-row>
+
       <b-row align-h="center" v-show="showbutton">
           <div>
        <button  @click.prevent="reset">Clear</button>
          </div>
-      </b-row>>
+      </b-row>
 
   </div>
 
@@ -335,6 +338,7 @@ export default {
 </script>
 
 <style scoped>
+
 form {
   margin: 2rem auto;
   max-width: 50rem;
