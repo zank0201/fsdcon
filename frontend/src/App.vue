@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-primary">
   <a class="navbar-brand" href="#">FSDCON</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation" wfd-id="657">
     <span class="navbar-toggler-icon" wfd-id="472"></span>
@@ -12,18 +12,18 @@
          <router-link class="nav-link" to="/">Home</router-link>
       </li>
       <li class="nav-item" wfd-id="468">
-        <router-link class="nav-link" to="/IndexSummary">Index Summary</router-link>
-      </li>
-      <li class="nav-item" wfd-id="468">
-        <router-link class="nav-link" to="/Portfolio">Portfolio</router-link>
+        <router-link class="nav-link" to="/IndexSummary">Quarterly Index Summary</router-link>
       </li>
 
             <li class="nav-item" wfd-id="468">
-        <router-link class="nav-link" to="/PortfolioTime">Portfolio Time</router-link>
+        <router-link class="nav-link" to="/PortfolioTime">Time Series Index Charts</router-link>
+      </li>
+      <li class="nav-item" wfd-id="468">
+        <router-link class="nav-link" to="/Portfolio">Portfolio Construction</router-link>
       </li>
 
       <li class="nav-item" wfd-id="467">
-        <a class="nav-link" href="http://fsd-documentation.s3-website.af-south-1.amazonaws.com/docs/build/html/index.html">About</a>
+        <a class="nav-link" href="http://fsd-documentation.s3-website.af-south-1.amazonaws.com/docs/build/html/index.html">Documentation</a>
       </li>
 
     </ul>
@@ -32,7 +32,9 @@
 </nav>
 
     <router-view/>
+
   </div>
+
 </template>
 
 <script>

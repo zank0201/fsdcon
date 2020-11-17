@@ -77,6 +77,7 @@ def GetBetasMktAndSpecVols(rDate, ICs, mktIndexCode, portframe):
     frame = datetbl.loc[datetbl["Instrument"].isin(ICs)]
     # print(frame)
     frame = pd.merge(frame, portframe, on='Instrument')
+    print(frame)
     betasframe = frame.loc[frame["Index"] == mktIndexCode]
     betasframe['Beta'] = betasframe['Beta'].fillna(0)
 

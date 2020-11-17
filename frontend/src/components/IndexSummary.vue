@@ -5,9 +5,8 @@
   <!-- Image and text -->
 
   <b-form v-show="isShown" @submit.prevent="GetIcs">
-
       <b-form-group id="input-group-1"
-  label="Please select a date"
+  label="Please select a date:"
   label-for="rdate">
     <b-form-select
       name="rdate"
@@ -18,7 +17,7 @@
   </b-form-group>
 
   <b-form-group id="input-group-2"
-  label="Please select an index code"
+  label="Please select an index code:"
   label-for="indexcode">
     <b-form-select
       name="indexcode"
@@ -30,9 +29,9 @@
 
   </b-form-group>
 
-    <div>
+     <b-row align-h="center">
       <button v-on:click="isShown = !isShown">Submit</button>
-     </div>
+     </b-row>
 
 </b-form>
 
@@ -40,10 +39,10 @@
 <!--    Graphs-->
     <div class="row">
         <div class="col-md-6">
-          <chart :options="ChartOptionsBar"></chart>
+          <v-chart :options="ChartOptionsBar"></v-chart>
         </div>
         <div class="col-md-6">
-            <chart :options="ChartOptionsPie"></chart>
+            <v-chart :options="ChartOptionsPie"></v-chart>
         </div>
     </div>
 
@@ -83,19 +82,20 @@
         <zg-column index="pfSpecVol" header="Portfolio Specific Variance"></zg-column>
         <zg-column index="pfVol" header="Portfolio Variance"></zg-column>
     </zing-grid>
-  <div class="mt-3">
-    <div class="col-4">
-      <button @click="downloadfiles">Download Files</button>
-    </div>
-  </div>
-      <b-row align-h="center" v-show="showbutton">
-          <div>
+
+  <div class="container" v-show="showbutton">
+       <div class="row justify-content-between">
+          <div class="col-4">
        <button  @click.prevent="reset">Clear</button>
          </div>
-      </b-row>
+         <div class="col-4">
+      <button @click="downloadfiles">Download Files</button>
+    </div>
+       </div>
 
   <div>
 </div>
+  </div>
   </div>
 </div>
 </template>
@@ -104,8 +104,13 @@
 // eslint-disable-next-line no-unused-vars
 import Zingrid from 'zinggrid'
 import axios from 'axios'
-
+import 'echarts/lib/chart/bar'
+import 'echarts/lib/chart/pie'
+import ECharts from 'vue-echarts'
 export default {
+  components: {
+    'v-chart': ECharts
+  },
 
   data () {
     return {
@@ -217,6 +222,9 @@ export default {
 
     plotWeights () {
       this.ChartOptionsBar = {
+        tooltip: {
+          trigger: 'axis'
+        },
         xAxis: {
           // eslint-disable-next-line
           data: this.allalphas,
@@ -326,8 +334,8 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 form {
-  margin: 2rem auto;
-  max-width: 50rem;
+  margin: 4rem auto;
+  max-width: 30rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
   padding: 2rem;
@@ -342,6 +350,8 @@ form {
 
 label {
   font-weight: bold;
+  margin-bottom: 2%;
+  margin-top: 2%;
 }
 
 h2 {
@@ -356,14 +366,9 @@ input {
 
 select {
   display: block;
-  width: 100%;
+  width: auto;
   font: inherit;
   margin-top: 0.5rem;
-
-}
-
-select {
-  width: auto;
 
 }
 
@@ -375,6 +380,8 @@ select {
   cursor: pointer;
   padding: 0.75rem 2rem;
   border-radius: 30px;
+    margin-top: 3%;
+    margin-bottom: 5%;
 }
 
 button:hover,

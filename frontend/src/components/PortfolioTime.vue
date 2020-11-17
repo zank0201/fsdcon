@@ -2,7 +2,7 @@
      <div>
       <b-form v-show="step===1">
  <b-form-group id="input-group-2"
-  label="Please select an index code"
+  label="Please select an index code:"
   label-for="indexcode">
     <b-form-select
       name="indexcode"
@@ -13,37 +13,34 @@
       required></b-form-select>
 
   </b-form-group>
-        <div>
+        <div class="container">
+       <div class="row justify-content-between">
+      <div class="col-4">
 
       <button @click.prevent="riskDates">Next</button>
-
      </div>
+     </div>
+        </div>
    </b-form>
-
-<div class="row">
-        <div class="col-md-6">
-          <chart :options="chartOptionsLine"></chart>
-        </div>
-
-</div>
-       <div class="row">
-        <div class="col-md-6">
-          <chart :options="chartRisks"></chart>
-        </div>
-
-       </div>
-       <b-row align-h="center" v-show="showbutton">
-          <div>
+ <div class ="row justify-content-center" v-show="step===2">
+          <v-chart :options="chartRisks"></v-chart>
+          <div class="col-4" v-show="step===2">
        <button  @click.prevent="reset">Clear</button>
          </div>
-      </b-row>>
-     </div>
 
+</div>
+
+     </div>
 </template>
 
 <script>
 import axios from 'axios'
+import ECharts from 'vue-echarts'
+import 'echarts/lib/chart/line'
 export default {
+  components: {
+    'v-chart': ECharts
+  },
 
   name: 'PortfolioTime',
   data () {
@@ -119,21 +116,29 @@ export default {
         .then(response => {
           this.dates_list = response.data
           this.riskSysVol()
-          this.plotBeta()
+          // this.plotBeta()
         })
     },
     plotRisks () {
       this.chartRisks = {
-        title: {
-          text: 'Portfolio Risks',
-          x: 'center',
-          textStyle: {
-            fontSize: 24
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross',
+            label: {
+              backgroundColor: '#6a7985'
+            }
           }
         },
-        tooltip: {
-          trigger: 'axis'
+        color: ['#e5323e', '#BB33FF'],
+        title: {
+          text: 'Portfolio Risks',
+          x: 'left',
+          textStyle: {
+            fontSize: 20
+          }
         },
+
         grid: {
           left: '3%',
           right: '4%',
@@ -141,11 +146,20 @@ export default {
           containLabel: true
         },
         toolbox: {
+          left: 'center',
           feature: {
+            dataZoom: {
+              yAxisIndex: 'none'
+            },
+            restore: {},
             saveAsImage: {}
           }
         },
-        legend: {},
+        legend: {
+          right: '0%',
+          orient: 'vertical',
+          data: ['Index Variance', 'Beta']
+        },
         xAxis: {
           type: 'category',
           data: this.dates_list
@@ -155,45 +169,19 @@ export default {
         },
         series: [
           {
-            name: 'Portfolio Systemic Variance',
+            name: 'Index Variance',
             type: 'line',
+            stack: 'portfolio',
             data: this.risk_sysvols
           },
           {
-            name: 'Portfolio Variance',
+            name: 'Beta',
             type: 'line',
-            data: this.risk_pfvols
-          },
-          {
-            name: 'Portfolio Specific Variance',
-            type: 'line',
-            data: this.risk_pfspec
-          }
-        ]
-      }
-    },
-    plotBeta () {
-      this.chartOptionsLine = {
-        xAxis: {
-          data: this.dates_list
-        },
-        yAxis: {
-          type: 'value'
-        },
-        series: [
-          {
-            type: 'line',
+            stack: 'portfolio',
             data: this.betalist
           }
-        ],
-        title: {
-          text: 'Portfolio Betas',
-          x: 'center',
-          textStyle: {
-            fontSize: 24
-          }
-        },
-        color: ['#127ac2']
+
+        ]
       }
     }
 
@@ -203,20 +191,24 @@ export default {
 
 <style scoped>
 form {
-  margin: 2rem auto;
-  max-width: 50rem;
+  margin: 4rem auto;
+  max-width: 30rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
   padding: 2rem;
   background-color: #ffffff;
+
 }
 
 .form-control {
   margin: 0.5rem 0;
+
 }
 
 label {
   font-weight: bold;
+  margin-bottom: 2%;
+  margin-top: 2%;
 }
 
 h2 {
@@ -226,17 +218,15 @@ h2 {
 
 input {
   width: 200px;
+
 }
 
 select {
   display: block;
-  width: 100%;
+  width: auto;
   font: inherit;
   margin-top: 0.5rem;
-}
 
-select {
-  width: auto;
 }
 
   button {
@@ -247,6 +237,7 @@ select {
   cursor: pointer;
   padding: 0.75rem 2rem;
   border-radius: 30px;
+    margin-top: 3%;
 }
 
 button:hover,
@@ -254,5 +245,15 @@ button:active {
   border-color: #002350;
   background-color: #002350;
 }
-
+/*jumbotron {*/
+/*  text-align: center;*/
+/*  align-items: center;*/
+/*  alignment: center;*/
+/*}*/
+  .echarts {
+    height: 700px;
+    margin-top: 2%;
+    margin-right: 15%;
+    width: 900px;
+  }
 </style>

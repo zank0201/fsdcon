@@ -3,7 +3,7 @@
 
       <b-form v-show="step===1" @submit.prevent="GetIcs">
    <b-form-group id="input-group-1"
-  label="Please select the market index code"
+  label="Please select the market index code:"
   label-for="mktIndex">
     <b-form-select
       name="mktIndex"
@@ -13,14 +13,14 @@
         'J250', 'J257', 'J258']"
       required></b-form-select>
   </b-form-group>
-        <div>
+        <b-row align-h="center">
               <button>Next</button>
-     </div>
+     </b-row>
    </b-form>
 
    <b-form v-show="step===2">
       <b-form-group id="input-group-2"
-  label="Please select a Share"
+  label="Please select a Share:"
   label-for="shareCode">
     <b-form-select
       name="sharecode"
@@ -32,14 +32,14 @@
         <div class="mt-3">Selected: <strong>{{ selected }}</strong></div>
 
   </b-form-group>
-     <div class="mt-3">
-      <div>
+     <div class="container">
+       <div class="row justify-content-between">
+      <div class="col-4">
       <button @click.prevent="next">Next</button>
      </div>
-     </div>
-     <div class="mt-3">
-     <div>
+     <div class="col-4">
       <button @click.prevent="prev">Back</button>
+     </div>
      </div>
      </div>
 
@@ -48,61 +48,55 @@
      <div v-show="this.addList<this.selected.length">
      <b-form-input v-model.number="weightsVals"
      type="float"
-     placeholder="Please insert a weight"
+     placeholder="Please insert a weight:"
      aria-describedby="input-live-help">
      </b-form-input>
      </div>
      <p v-show="incorrect===true">The weights do not add up to zero, please enter the correct weights</p>
-           <div>
-      <button v-show="this.addList<this.selected.length" @click="addWeights">Add</button>
-             <div class="mt-3">Selected ShareCode: <strong>{{selected}}</strong></div>
+     <div class="mt-3">Selected ShareCode: <strong>{{selected}}</strong></div>
              <div class="mt-3">Added weights: <strong>{{weightslist}}</strong></div>
+           <div class="container">
+       <div class="row justify-content-between">
+      <div class="col-4">
+      <button v-show="this.addList<this.selected.length" @click="addWeights">Add</button>
      </div>
 
-       <div class="mt-3">
-    <div class="col-4">
+<div class="col-4">
      <button @click.prevent="prev">Back</button>
     </div>
-       </div>
-<div class="mt-3">
-         <div>
+          <div class="col-4">
            <button v-show="this.addList===this.selected.length" @click.prevent="checkweights">Done</button>
          </div>
-</div>
-
+       </div>
+           </div>
    </b-form>
-<b-row align-h="center">
+   <div  class ="row justify-content-center" v-show="step===4">
 
-        <div class="col-md-6">
-          <chart :options="chartOptionsLine"></chart>
-        </div>
+<!--        <div>-->
+<!--          <v-chart :options="chartOptionsLine"></v-chart>-->
+<!--        </div>-->
 
-  </b-row>
+          <v-chart :options="chartRisks"></v-chart>
 
-<b-row align-h="center">
-        <div class="col-md-6">
-          <chart :options="chartRisks"></chart>
-        </div>
-
-</b-row>
-
-      <b-row align-h="center" v-show="showbutton">
-          <div>
+          <div class="col-4">
        <button  @click.prevent="reset">Clear</button>
          </div>
-      </b-row>
 
+</div>
   </div>
 
 </template>
 <script>
 import axios from 'axios'
-import PortfolioTime from './PortfolioTime'
+
+import ECharts from 'vue-echarts'
+import 'echarts/lib/chart/line'
 
 export default {
   name: 'Portfolio',
   components: {
-    PortfolioTime
+    'v-chart': ECharts
+
   },
   data () {
     return {
@@ -154,6 +148,7 @@ export default {
       if (this.step === 2) {
         this.weightslist = []
         this.selected = []
+        this.addList = 0
       } else if (this.step === 1) {
         this.selected = []
         this.shareCode = 'J200'
@@ -200,6 +195,7 @@ export default {
       // eslint-disable-next-line eqeqeq
       if (total == 1) {
         this.step++
+        this.incorrect = false
         this.portfolioBeta()
       } else {
         this.weightslist = []
@@ -225,7 +221,6 @@ export default {
           this.dates_list = response.data
           this.incorrect = false
           this.riskDates()
-          this.plotBeta()
         })
     },
     riskDates () {
@@ -260,30 +255,32 @@ export default {
     },
     plotRisks () {
       this.chartRisks = {
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross',
+            label: {
+              backgroundColor: '#6a7985'
+            }
+          }
+        },
+        color: ['#003366', '#006699', '#e5323e', '#BB33FF'],
+
         title: {
           text: 'Portfolio Risks',
-          x: 'center',
+          x: 'left',
           textStyle: {
             fontSize: 24
           }
         },
-        tooltip: {
-          trigger: 'axis'
+        legend: {
+          right: '0%',
+          orient: 'vertical',
+          data: ['Systematic Variance', 'Portfolio Variance', 'Specific Variance', 'Beta']
         },
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          containLabel: true
-        },
-        toolbox: {
-          feature: {
-            saveAsImage: {}
-          }
-        },
-        legend: {},
         xAxis: {
           type: 'category',
+          boundaryGap: false,
           data: this.risk_dates
         },
         yAxis: {
@@ -291,45 +288,31 @@ export default {
         },
         series: [
           {
-            name: 'Portfolio Systemic Variance',
+            name: 'Systematic Variance',
             type: 'line',
+            stack: 'risk',
             data: this.risk_sysvols
           },
           {
             name: 'Portfolio Variance',
             type: 'line',
+            stack: 'risk',
             data: this.risk_pfvols
           },
           {
-            name: 'Portfolio Specific Variance',
+            name: 'Specific Variance',
             type: 'line',
+            stack: 'risk',
             data: this.risk_pfspec
-          }
-        ]
-      }
-    },
-    plotBeta () {
-      this.chartOptionsLine = {
-        xAxis: {
-          data: this.dates_list
-        },
-        yAxis: {
-          type: 'value'
-        },
-        series: [
+          },
           {
+            name: 'Beta',
             type: 'line',
+            stack: 'portfolio',
             data: this.betalist
           }
-        ],
-        title: {
-          text: 'Portfolio Betas',
-          x: 'center',
-          textStyle: {
-            fontSize: 24
-          }
-        },
-        color: ['#127ac2']
+        ]
+
       }
     }
   }
@@ -340,8 +323,8 @@ export default {
 <style scoped>
 
 form {
-  margin: 2rem auto;
-  max-width: 50rem;
+  margin: 4rem auto;
+  max-width: 30rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
   padding: 2rem;
@@ -354,6 +337,8 @@ form {
 
 label {
   font-weight: bold;
+  margin-bottom: 4%;
+  margin-top: 2%;
 }
 
 h2 {
@@ -363,17 +348,15 @@ h2 {
 
 input {
   width: 200px;
+
 }
 
 select {
   display: block;
-  width: 100%;
+  width: auto;
   font: inherit;
   margin-top: 0.5rem;
-}
 
-select {
-  width: auto;
 }
 
   button {
@@ -384,6 +367,7 @@ select {
   cursor: pointer;
   padding: 0.75rem 2rem;
   border-radius: 30px;
+    margin-top: 3%;
 }
 
 button:hover,
@@ -391,5 +375,17 @@ button:active {
   border-color: #002350;
   background-color: #002350;
 }
+
+  .echarts {
+    height: 700px;
+    margin-top: 2%;
+    margin-right: 15%;
+    width: 900px;
+  }
+/*jumbotron {*/
+/*  text-align: center;*/
+/*  align-items: center;*/
+/*  alignment: center;*/
+/*}*/
 
 </style>

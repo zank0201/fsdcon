@@ -1,6 +1,6 @@
 <template>
   <div>
-  <div class="jumbotron" :style="{'background-image':'url(https://images.unsplash.com/photo-1535320903710-d993d3d77d29?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2700&q=80)'}">
+  <div class="jumbotron">
   <b-jumbotron class="jumbotron"
                header="FSD Consulting" lead=
     "Welcome to FSD Consulting's interactive dashboard featuring visual and static representation of key risk statistics.">
@@ -21,8 +21,8 @@
       retrieve information on that stock, such as its Beta, Unique Risk, Total Risk and its constituent weight in a particular index.
       You can also have access to downloadable covariance matrices to view the co-movements between all the indices.
     </b-card-text>
-    <div class="mt-3">
-      <b-button variant="primary" :to="'IndexSummary'">Index Summary</b-button>
+    <div class ="row justify-content-center">
+      <b-button pill variant="primary" :to="'IndexSummary'">Index Summary</b-button>
     </div>
   </b-card>
 
@@ -36,8 +36,8 @@
       Create a portfolio based on weights and stocks of your choice. You can then track
       the performance of the beta, Systematic risk, the specific variance and total risk of your portfolio over time.
     </b-card-text>
-    <div class="mt-3">
-      <b-button variant="primary" :to="'Portfolio'">Create your Portfolio</b-button>
+    <div class ="row justify-content-center">
+      <b-button pill variant="primary" :to="'Portfolio'">Create your Portfolio</b-button>
     </div>
   </b-card>
 
@@ -51,8 +51,8 @@
      The portfolio summary allows you to track the performance of the portfolio of your chosen index over time. You can then track
       the performance of the beta, Systematic risk, the specific variance and total risk.
     </b-card-text>
-    <div class="mt-3">
-      <b-button variant="primary" :to="'PortfolioTime'">Portfolio Summary</b-button>
+    <div class ="row justify-content-center">
+      <b-button pill variant="primary" :to="'PortfolioTime'">Portfolio Summary</b-button>
     </div>
   </b-card>
 
@@ -72,5 +72,4 @@ export default {
   .jumbotron {
     text-align: center;
   }
-
 </style>

@@ -33,7 +33,7 @@ ma = Marshmallow(app)
 import models
 
 
-@app.route("/getweights", methods=["POST", "GET"])
+@app.route("/getweights", methods=["POST"])
 @cross_origin()  # allow all origins all methods.
 def weights_table():
     '''
@@ -44,7 +44,7 @@ def weights_table():
     # delete tables as something is posted
     db.session.query(models.Result).delete()
     db.session.query(models.getweights).delete()
-    db.session.query(models.marketvol).delete()
+
     db.session.commit()
 
     # date input form frontend
@@ -65,6 +65,9 @@ def weights_table():
         db.session.add(new_weights)
         db.session.commit()
     # Once post is completed, redirect to betas output
+
+
+
     return redirect(url_for('betas_table', rdate=rdate, mktIndexCode=mktIndexCode, indexCode=indexCode))
 
 
@@ -79,6 +82,7 @@ def betas_table(rdate, mktIndexCode, indexCode):
     :return: json output of Results table
     '''
     # Query getweights table to get weights and alpha
+    db.session.query(models.marketvol).delete()
     IC_data = db.session.query(models.getweights.alpha)
     weight_data = db.session.query(models.getweights.weights)
 
@@ -126,7 +130,7 @@ def betas_table(rdate, mktIndexCode, indexCode):
     return jsonify(output)
 
 
-@app.route('/getweights/stats')
+@app.route('/getweights/stats', methods=["GET"])
 @cross_origin()
 def calcstats():
     '''
