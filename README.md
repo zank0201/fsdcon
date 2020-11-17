@@ -30,6 +30,12 @@ CREATE DATABASE fsdcon
 ```
 pip install -r requirement.txt
 ```
+
+* Run the environement variables before running the API
+
+```
+export APP_SETTINGS="config.DevelopmentConfig"
+```
 * Run the API
 ```
 python app.py
